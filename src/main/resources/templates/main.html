@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="fragments/layout :: head"></head>
+
+    <body>
+
+        <header th:replace="fragments/layout :: navbar"/>
+
+        <div sec:authorize="hasAuthority('USER')" th:replace="fragments/layout :: sidebar"></div>
+
+        <div class="container" style="margin-top:30px">
+
+            <div>
+                <form name="f" th:action="@{/main}" method="post">               
+                    <fieldset>
+                        <legend>Tervetuloa saunaan!</legend>
+                        <div th:if="${param.error}" class="alert alert-error">    
+                            Väärä löylytunnus tai salasana.
+                        </div>
+                        <div th:if="${param.logout}" class="alert alert-success"> 
+                            Kirjauduit ulos onnistuneesti.
+                        </div>
+                        <label for="username">Löylytunnus</label>
+                        <input type="text" id="username" name="username"/>        
+                        <label for="password">Salasana</label>
+                        <input type="password" id="password" name="password"/>    
+                        <div class="form-actions">
+                            <button type="submit" class="btn">Kirjaudu sisään!</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+
+            <div> 
+                <h4><a class="nav-link" th:href="@{/register}">Uusi saunoja?</a></h4>
+            </div>
+
+        </div>
+
+    </body>
+</html>

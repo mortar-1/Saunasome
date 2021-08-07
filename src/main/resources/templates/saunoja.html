@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.springframework.org/security/tags">
+
+    <head th:replace="fragments/layout :: head"></head>
+
+    <style th:replace="fragments/layout :: style"></style>
+
+    <body>
+
+        <header th:replace="fragments/layout :: navbar"/>
+
+        <div th:replace="fragments/layout :: sidebar"></div>
+
+        <div class="container" style="margin-top:30px" th:unless="${authorBlockedUsernames.contains(currentSaunoja.username)}" >
+
+            <div class="w3-container w3-card w3-white w3-round w3-section">
+
+                <!-- USERNAME AND NAME -->
+
+                <h2 th:text="${saunoja.username}">Nimimerkki</h2>
+                <h4 th:text="${saunoja.firstName + ' ' + saunoja.lastName}">Nimi</h4>
+
+                <hr class="w3-clear"/>
+
+                <!--ROLE CONTROL-->
+
+                <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
+
+                    <button th:unless="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addAdmin').click()"><i class="fa fa-thumbs-up"></i> tee ADMIN </button>
+                    <button th:if="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeAdmin').click()"><i class="fa fa-thumbs-up"></i> peru ADMIN </button>
+                    
+                    <button th:unless="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('addGod').click()"><i class="fa fa-thumbs-up"></i> tee GOD </button>
+                    <button th:if="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('removeGod').click()"><i class="fa fa-thumbs-up"></i> peru GOD </button>
+                    
+                    <br/>
+                    <br/>
+                    
+                    <hr class="w3-clear"/>
+
+                </div>
+
+                <div>
+                    <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('ADMIN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
+                        <input type="hidden" name="action" th:value="addAdmin"/>
+                        <input type="submit" style="display:none" id="addAdmin"/>
+                    </form>
+
+                    <form sec:authorize="hasAuthority('GOD')" th:if="${saunoja.roles.contains('ADMIN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
+                        <input type="hidden" name="action" th:value="removeAdmin"/>
+                        <input type="submit" style="display:none" id="removeAdmin"/>
+                    </form>
+
+                    <br/>
+
+                    <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('GOD')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
+                        <input type="hidden" name="action" th:value="addGod"/>
+                        <input type="submit" style="display:none" id="addGod"/>
+                    </form>
+
+                    <form sec:authorize="hasAuthority('GOD')" th:if="${saunoja.roles.contains('GOD')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
+                        <input type="hidden" name="action" th:value="removeGod"/>
+                        <input type="submit" style="display:none" id="removeGod"/>
+                    </form>
+                </div>
+
+                <!-- PROFILE PICTURE -->
+
+                <a th:href="@{'/photo/' + ${profilePicture.Id} + '/view'}"><img class="center" th:src="@{'/photo/' + ${profilePicture.Id} }" height="200"/></a>
+
+                <br/>
+                <hr class="w3-clear"/>
+
+                <!--FOLLOW CONTROL-->
+
+                <div th:if="${!saunoja.username.equals(currentSaunoja.username)}">
+
+                    <button th:unless="${followingUsernames.contains(saunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
+                    <button th:if="${followingUsernames.contains(saunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> Lakkaa kuuntelemasta</button>
+
+                    <button th:unless="${blockedUsernames.contains(saunoja.username)}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i> Estä</button>
+                    <button th:if="${blockedUsernames.contains(saunoja.username)}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i> Lopeta esto</button>
+
+                    <br/>
+                    <br/>
+                    <hr class="w3-clear"/>
+
+                </div>
+
+                <div th:unless="${followingUsernames.contains(saunoja.username)}">
+                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
+                        <input type="hidden" name="action" value="follow"/>
+                        <input type="submit" style="display:none" id="follow"/>
+                    </form>
+                </div>
+
+                <div th:if="${followingUsernames.contains(saunoja.username)}">
+                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
+                        <input type="hidden" name="action" value="unfollow"/>
+                        <input type="submit" style="display:none" id="unfollow"/>
+                    </form>
+                </div>
+
+                <div th:unless="${blockedUsernames.contains(saunoja.username)}">
+                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
+                        <input type="hidden" name="action" value="block"/>
+                        <input type="submit" style="display:none" id="block"/>
+                    </form>
+                </div>
+
+                <div th:if="${blockedUsernames.contains(saunoja.username)}">
+                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
+                        <input type="hidden" name="action" value="unblock"/>
+                        <input type="submit" style="display:none" id="unblock"/>
+                    </form>
+                </div>
+
+            </div>
+
+
+
+            <!-- PHOTOS -->
+
+            <div class="row" th:unless="${authorBlockedUsernames.contains(currentSaunoja.username) and !currentSaunoja.roles.contains('ADMIN')}">
+
+                <div class="col-4"  th:each="photo : ${photos}">
+
+                    <a th:href="@{'/photo/' + ${photo.Id} + '/view'}"><img th:src="@{'/photo/' + ${photo.Id} }" height="100"/></a>
+
+                </div>
+
+            </div>
+
+            <br/>
+
+            <!-- ADD NEW PHOTO -->
+
+            <div class="container" style="margin-top:30px">
+
+                <div>
+
+                    <form th:action="@{'/saunojat/' + ${saunoja.username} + '/photo'}" method="POST" enctype="multipart/form-data" id="newPhoto" th:object="${newPhoto}">               
+                        <fieldset>
+                            <legend>Lisää uusi kuva</legend>
+
+                            <div th:if="${#fields.hasErrors('photo')}" class="alert alert-error" th:errors="*{photo}"> 
+                                Kuva virhe.
+                            </div>
+
+                            <div th:if="${#fields.hasErrors('description')}" class="alert alert-error"> 
+                                Tarina on liian pitkä.
+                            </div>
+
+                            <div>
+
+                                <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('file').click()" style="white-space: nowrap"><i class="fa fa-file-image-o w3-left"></i> &nbsp; Valitse kuva </button>
+
+                                <div id="file-filename" class="w3-right"></div>
+
+                            </div>
+
+                            <textarea placeholder="Kuvan tarina... (enintään 100 merkkiä)" class="textarea" name="description" form="newPhoto"></textarea>
+
+                            <input type="file" name="photo" style="display:none;" id="file"/>
+
+                            <p> Asetetaanko kuva profiilikuvaksi? &nbsp;<input type="checkbox" name="isProfilepicture"/></p>
+
+                            <div class="form-actions">
+                                <button type="submit" class="w3-button w3-theme-d1 w3-margin-bottom">Lisää kuva <i class="fa fa-upload"></i></button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+
+                <br/>
+
+            </div>
+
+        </div>
+
+        <div class="container" th:if="${authorBlockedUsernames.contains(currentSaunoja.username)}">
+            <h3 th:text="${saunoja.username + ' on estänyt sinua näkemästä tätä sisältöä.'}"></h3>
+        </div>
+
+        <script th:src="@{/javascript/showChoosenFile.js}"></script>
+    </body>
+</html>

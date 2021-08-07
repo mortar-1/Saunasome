@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.springframework.org/security/tags">
+
+    <head th:replace="fragments/layout :: head"></head>
+
+    <style th:replace="fragments/layout :: style"/>
+
+    <body>
+
+        <header th:replace="fragments/layout :: navbar"/>
+
+        <div th:replace="fragments/layout :: sidebar"/>
+
+
+        <div class="container" style="margin-top:30px">
+
+
+            <div class="w3-container w3-card w3-white w3-round w3-section">
+
+                <br/>
+
+                <textarea placeholder="Uusi viesti" class="textarea" name="newMessageContent" form="newMessageForm"></textarea>
+
+                <br/>
+                <hr class="w3-clear"/>
+
+                <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewMessage').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
+
+                <form method="POST" th:action="@{/wall}" id="newMessageForm">
+                    <input type="submit" style="display: none" th:id="sendNewMessage"/>
+                </form>
+
+            </div>
+
+            <br/>
+
+            <div th:each="message : ${messages}">
+                <div class="w3-container w3-card w3-white w3-round w3-margin">
+                    <br/>
+                    <a th:href="@{'/saunojat/' + ${message.author.username}}"><img th:src="@{'/photo/' + ${message.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:45px; height:45px"/></a>
+                    <span class="w3-right w3-opacity" th:unless="${message.created.toLocalDate().equals(#temporals.createToday())}" th:text="${#temporals.format(message.created, 'd.M.yy HH:mm')}">Viestin ajankohta</span>
+                    <span class="w3-right w3-opacity" th:if="${message.created.toLocalDate().equals(#temporals.createToday())}" th:text="${' tänään ' + #temporals.format(message.created, 'HH:mm')}">Viestin ajankohta</span>
+                    <h6 th:unless="${message.isNewPhotoMessage}" th:text="${message.author.username}">Löylytunnus</h6>
+                    <h6 th:if="${message.isNewPhotoMessage}" th:text="${message.author.username + ' lisäsi uuden kuvan.'}">Viesti uudesta kuvasta</h6>
+
+                    <hr class="w3-clear"/>
+
+                    <p th:unless="${message.isNewPhotoMessage}" th:text="${message.content}">Viestin sisältö</p>
+                    <a  th:if="${message.isNewPhotoMessage}"  th:href="@{'/photo/' + ${message.photoId} + '/view'}"> <img th:src="@{'/photo/' + ${message.photoId}}" alt="Avatar" class="center" style="height:100px;"/> </a>
+
+                    <br/>
+                    <hr class="w3-clear"/>
+
+                    <button th:unless="${message.likes.contains(currentSaunoja.username) or message.isNewPhotoMessage}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('like' + ${message.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
+                    <button th:if="${message.likes.contains(currentSaunoja.username) and !message.isNewPhotoMessage}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('unlike' + ${message.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
+                    <a th:unless="${message.isNewPhotoMessage}" th:href="@{'/wall/' + ${message.id}}" ><button type="button" class="w3-button w3-theme-d2 w3-margin-bottom"><i class="fa fa-comment"></i> <span th:text="${'Kommentoi(' + #lists.size(message.comments) + ')'}">Kommentointi</span></button></a>
+                    <button th:if="${message.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d2 w3-margin-bottom" th:attr="onclick=|document.getElementById('delete' + ${message.id}).click()|"><i class="fa fa-close"></i> Poista viesti</button>  
+                    <form method="POST" th:action="@{'/wall/' + ${message.Id} + '/delete'}">
+                        <input type="hidden" name="usernameAuthor" th:value="${message.author.username}"/>
+                        <input type="hidden" name="redirectTo" value="/wall/"/>
+                        <input type="submit" style="display:none;" th:id="${'delete' + message.id}" />
+                    </form>
+                    <form th:unless="${message.likes.contains(currentSaunoja.username)}" method="POST" th:action="@{'/wall/' + ${message.Id} + '/like'}">
+                        <input type="hidden" name="action" th:value="like"/>
+                        <input type="hidden" name="redirectTo" value="/wall"/>
+                        <input type="submit" style="display:none;" th:id="${'like' + message.id}"/>
+                    </form>
+                    <form th:if="${message.likes.contains(currentSaunoja.username)}" method="POST" th:action="@{'/wall/' + ${message.Id} + '/like'}">
+                        <input type="hidden" name="action" th:value="unlike"/>
+                        <input type="hidden" name="redirectTo" value="/wall"/>
+                        <input type="submit" style="display:none;" th:id="${'unlike' + message.id}"/>
+                    </form>
+                </div>
+            </div>
+
+
+            <div th:if="${messages.isEmpty()}" class="w3-container w3-card w3-white w3-round w3-margin">
+                <br/>
+                <a th:href="@{'/saunojat/' + ${welcomeMessage.author.username}}"><img th:src="@{'/photo/' + ${welcomeMessage.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:60px; height:60px"/></a>
+                <span class="w3-right w3-opacity" th:unless="${welcomeMessage.created.toLocalDate().equals(#temporals.createToday())}" th:text="${#temporals.format(welcomeMessage.created, 'HH:mm d.M.yy')}">Viestin ajankohta</span>
+                <span class="w3-right w3-opacity" th:if="${welcomeMessage.created.toLocalDate().equals(#temporals.createToday())}" th:text="${' tänään ' + #temporals.format(welcomeMessage.created, 'HH:mm')}">Viestin ajankohta</span>
+                <h4 th:text="${welcomeMessage.author.username}">Löylytunnus</h4>
+
+                <br/>
+                <hr class="w3-clear"/>
+
+                <p th:text="${welcomeMessage.content}">Viestin sisältö</p>
+                <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom">Etsi kuunneltavia saunojia </button> 
+            </div>
+
+        </div> 
+
+
+
+
+    </body>
+</html>
