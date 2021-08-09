@@ -45,22 +45,14 @@ public class PhotoController {
     }
 
     @GetMapping("/photo/{id}/view")
-    public String viewPhoto(Model model, @PathVariable Long id) {
+    public String viewPhoto(Model model, @PathVariable Long id, @ModelAttribute NewComment newComment) {
 
         if (!photoRepository.existsById(id)) {
 
             return "photoNotFound";
         }
 
-        model.addAttribute("comments", commentService.getLast10PhotoComments(id));
-
-        photoService.viewPhoto(model, id);
-
-        saunojaService.addCurrentSaunojaToModel(model);
-
-        saunojaService.addFollowingFollowedByBlockedToModel(model);
-
-        saunojaService.addBlockedByProfilePageAuthor(model, photoRepository.getOne(id).getAuthor().getUsername());
+        photoService.addAttributesToModelForPagePhoto(model, id);
 
         return "photo";
     }
@@ -70,7 +62,7 @@ public class PhotoController {
 
         if (photoService.hasErrorsOnAddingNewPhoto(newPhoto, bindingResult)) {
 
-            saunojaService.addAttributesForPageSaunoja(model, username);
+            saunojaService.addAttributesToModelForPageSaunoja(model, username);
 
             return "saunoja";
         }

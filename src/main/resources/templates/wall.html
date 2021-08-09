@@ -21,14 +21,21 @@
 
                 <br/>
 
-                <textarea placeholder="Uusi viesti" class="textarea" name="newMessageContent" form="newMessageForm"></textarea>
+                <form method="POST" th:action="@{/wall}" id="newMessageForm" th:object="${newMessage}">
 
-                <br/>
-                <hr class="w3-clear"/>
+                    <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="alert alert-error">    
+                        Viestin virheviesti.
+                        <hr/>
+                    </div>
 
-                <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewMessage').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
+                    <textarea placeholder="Uusi viesti (enintään 2000 merkkiä pitkä)" class="textarea" onkeyup="countChar(this)" name="content" form="newMessageForm"></textarea>
+                    <div id="charNum"></div>
 
-                <form method="POST" th:action="@{/wall}" id="newMessageForm">
+                    <br/>
+                    <hr class="w3-clear"/>
+
+                    <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewMessage').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
+
                     <input type="submit" style="display: none" th:id="sendNewMessage"/>
                 </form>
 
@@ -92,8 +99,8 @@
 
         </div> 
 
-
-
+        <script src="http://code.jquery.com/jquery-1.5.js"></script>
+        <script th:src="@{/javascript/charCount.js}"></script>
 
     </body>
 </html>

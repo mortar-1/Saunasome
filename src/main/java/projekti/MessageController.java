@@ -1,9 +1,12 @@
 package projekti;
 
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,42 +24,37 @@ public class MessageController {
     private SaunojaService saunojaService;
 
     @GetMapping("/wall")
-    public String viewWall(Model model) {
+    public String viewWall(Model model, @ModelAttribute NewMessage newMessage) {
 
-        messageService.addMessagesToModel(model, saunojaService.getCurrentSaunoja());
-
-        messageService.addWelcomeMessageToModel(model);
-
-        saunojaService.addCurrentSaunojaToModel(model);
-
-        saunojaService.addFollowingFollowedByBlockedToModel(model);
+        messageService.addAttributesToModelForPageWall(model);
 
         return "wall";
     }
 
     @PostMapping("/wall")
-    public String postNewMessage(@RequestParam String newMessageContent) {
+    public String postNewMessage(Model model, @Valid @ModelAttribute NewMessage newMessage, BindingResult bindingResult) {
 
-        messageService.postNew(newMessageContent);
+        if (messageService.hasErrorsInNewMessage(newMessage, bindingResult)) {
+
+            messageService.addAttributesToModelForPageWall(model);
+
+            return "wall";
+        }
+
+        messageService.postNew(newMessage.getContent());
 
         return "redirect:/wall";
     }
 
     @GetMapping("/wall/{id}")
-    public String viewMessage(Model model, @PathVariable Long id) {
+    public String viewMessage(Model model, @PathVariable Long id, @ModelAttribute NewComment newComment) {
 
         if (messageService.messageNotFound(id)) {
 
             return "messageNotFound";
         }
 
-        messageService.addPresentNextPreviousToModel(model, id);
-
-        saunojaService.addCurrentSaunojaToModel(model);
-
-        saunojaService.addFollowingFollowedByBlockedToModel(model);
-
-        model.addAttribute("comments", commentService.getLast10MessageComments(id));
+        messageService.addAttributesToModelForPageMessage(model, id);
 
         return "message";
     }

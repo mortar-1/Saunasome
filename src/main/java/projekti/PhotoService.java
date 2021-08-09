@@ -25,6 +25,22 @@ public class PhotoService {
 
     @Autowired
     private MessageService messageService;
+    
+    @Autowired
+    private CommentService commentService;
+
+    public void addAttributesToModelForPagePhoto(Model model, Long id) {
+
+        model.addAttribute("comments", commentService.getLast10PhotoComments(id));
+
+        addPhotoToModel(model, id);
+
+        saunojaService.addCurrentSaunojaToModel(model);
+
+        saunojaService.addFollowingFollowedByBlockedToModel(model);
+
+        saunojaService.addBlockedByProfilePageAuthor(model, photoRepository.getOne(id).getAuthor().getUsername());
+    }
 
     public boolean photoExists(Long id) {
 
@@ -48,9 +64,9 @@ public class PhotoService {
         }
 
         photo.setIsProfilePicture(true);
-        
+
         author.setProfilepictureId(id);
-        
+
         saunojaService.setProfilepictureId(author, id);
 
         photoRepository.save(photo);
@@ -101,12 +117,12 @@ public class PhotoService {
 
             bindingResult.rejectValue("photo", "error.newSaunoja", "Kuva on liian suuri ladattavaksi (enintään 5 MB).");
         }
-        
+
         if (newPhoto.getPhoto().getBytes().length == 0) {
-            
+
             bindingResult.rejectValue("photo", "error.newSaunoja", "Et valinnut kuvaa.");
         }
-       
+
         return bindingResult.hasErrors();
     }
 
@@ -144,7 +160,7 @@ public class PhotoService {
         model.addAttribute("photos", photoRepository.findByAuthor(saunojaService.getByUsername(Saunoja)));
     }
 
-    public void viewPhoto(Model model, Long id) {
+    public void addPhotoToModel(Model model, Long id) {
 
         Photo photo = photoRepository.getOne(id);
 

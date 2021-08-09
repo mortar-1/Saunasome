@@ -73,7 +73,7 @@ public class SaunojaController {
             return "saunojaNotFound";
         }
 
-        saunojaService.addAttributesForPageSaunoja(model, username);
+        saunojaService.addAttributesToModelForPageSaunoja(model, username);
 
         return "saunoja";
     }

@@ -283,7 +283,7 @@ public class SaunojaService {
         }
     }
 
-    public void addAttributesForPageSaunoja(Model model, String username) {
+    public void addAttributesToModelForPageSaunoja(Model model, String username) {
 
         photoService.addProfilePictureToModel(model, username);
 

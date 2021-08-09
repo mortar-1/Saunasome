@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 @Service
 public class CommentService {
@@ -41,6 +42,21 @@ public class CommentService {
         comment.setPhoto(photoRepository.getOne(id));
 
         commentRepository.save(comment);
+    }
+    
+    public Boolean hasErrorsInNewComment(BindingResult bindingResult, NewComment newComment) {
+        
+        if (newComment.getContent() != null && newComment.getContent().length() >= 2000) {
+
+            bindingResult.rejectValue("content", "error.message", "Kommentti on liian pitkä.");
+        }
+
+        if (newComment.getContent() == null || newComment.getContent().isBlank()) {
+
+            bindingResult.rejectValue("content", "error.message", "Kommentti ei saa olla tyhjä.");
+        }
+        
+        return bindingResult.hasErrors();
     }
 
     public List<Comment> getLast10MessageComments(Long id) {

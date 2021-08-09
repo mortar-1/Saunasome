@@ -77,6 +77,29 @@
 
             <div>
 
+                <div class="w3-container w3-card w3-white w3-round w3-margin">
+                    <br/>
+
+                    <form method="POST" th:action="@{'/photo/' + ${photo.Id} + '/comment'}" id="newCommentForm" th:object="${newComment}">
+
+                        <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="alert alert-error">    
+                            Kommentin virheviesti.
+                            <hr/>
+                        </div>
+
+                        <textarea placeholder="Uusi kommentti (enintään 2000 merkkiä pitkä)" class="textarea" onkeyup="countChar(this)" name="content" form="newCommentForm"></textarea>
+                        <div id="charNum"></div>
+
+                        <br/>
+                        <hr class="w3-clear"/>
+
+                        <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewComment').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
+
+
+                        <input type="submit" style="display: none" th:id="sendNewComment"/>
+                    </form>
+                </div>
+
                 <h3>Vihtoneet: </h3>
                 <ol>
                     <li th:each="likerUsername : ${photo.likes}">
@@ -127,25 +150,13 @@
                 </div>
             </div>
 
-            <div class="w3-container w3-card w3-white w3-round w3-margin">
-                <br/>
-                <textarea placeholder="Uusi kommentti" class="textarea" name="content" form="newCommentForm"></textarea>
-
-                <br/>
-                <hr class="w3-clear"/>
-
-                <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewComment').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
-
-                <form method="POST" th:action="@{'/photo/' + ${photo.Id} + '/comment'}" id="newCommentForm">
-                    <input type="submit" style="display: none" th:id="sendNewComment"/>
-                </form>
-            </div>
-
         </div>
 
         <div class="container" th:if="${authorBlockedUsernames.contains(currentSaunoja.username)}">
             <h3 th:text="${photo.author.username + ' on estänyt sinua näkemästä tätä sisältöä.'}"></h3>
         </div>
 
+        <script src="http://code.jquery.com/jquery-1.5.js"></script>
+        <script th:src="@{/javascript/charCount.js}"></script>
     </body>
 </html>

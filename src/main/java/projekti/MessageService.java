@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 @Service
 public class MessageService {
@@ -23,6 +24,33 @@ public class MessageService {
 
     @Autowired
     private SaunojaService saunojaService;
+    
+    @Autowired
+    private CommentService commentService;
+        
+    public void addAttributesToModelForPageWall(Model model) {
+        
+        addMessagesToModel(model, saunojaService.getCurrentSaunoja());
+
+        addWelcomeMessageToModel(model);
+
+        saunojaService.addCurrentSaunojaToModel(model);
+
+        saunojaService.addFollowingFollowedByBlockedToModel(model);
+    }
+    
+    public void addAttributesToModelForPageMessage(Model model, Long id) {
+                
+        addPresentNextPreviousToModel(model, id);
+
+        saunojaService.addCurrentSaunojaToModel(model);
+
+        saunojaService.addFollowingFollowedByBlockedToModel(model);
+
+        model.addAttribute("comments", commentService.getLast10MessageComments(id));
+        
+        saunojaService.addBlockedByProfilePageAuthor(model, messageRepository.getOne(id).getAuthor().getUsername());
+    }
 
     public Boolean messageNotFound(Long id) {
 
@@ -36,6 +64,21 @@ public class MessageService {
         message.setContent(newMessageContent);
 
         messageRepository.save(message);
+    }
+    
+    public Boolean hasErrorsInNewMessage(NewMessage newMessage, BindingResult bindingResult) {
+
+        if (newMessage.getContent() != null && newMessage.getContent().length() >= 2000) {
+
+            bindingResult.rejectValue("content", "error.message", "Viesti on liian pitkä.");
+        }
+
+        if (newMessage.getContent() == null || newMessage.getContent().isBlank()) {
+
+            bindingResult.rejectValue("content", "error.message", "Viesti ei saa olla tyhjä.");
+        }
+        
+        return bindingResult.hasErrors();
     }
 
     public void newPhotoMessage(Long photoId) {

@@ -2,6 +2,7 @@ package projekti;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ public class Comment extends AbstractPersistable<Long> {
     @ManyToOne
     private Saunoja author;
 
+    @Column(length = 2000)
     private String content;
 
     private LocalDateTime created;
