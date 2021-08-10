@@ -26,6 +26,7 @@ public class CommentService {
     @Autowired
     private SaunojaService saunojaService;
 
+    @PreAuthorize("hasAuthority('USER') and !hasAuthority('FROZEN')")
     public void commentMessage(Long id, String content) {
 
         Comment comment = newCommentWithTimeAuthorContentSet(content);
@@ -35,6 +36,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    @PreAuthorize("hasAuthority('USER') and !hasAuthority('FROZEN')")
     public void commentPhoto(Long id, String content) {
 
         Comment comment = newCommentWithTimeAuthorContentSet(content);

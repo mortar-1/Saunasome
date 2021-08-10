@@ -18,13 +18,12 @@ public class MessageController {
     private MessageService messageService;
 
     @Autowired
-    private CommentService commentService;
-
-    @Autowired
-    private SaunojaService saunojaService;
+    private AccountFreezeService accountFreezeService;
 
     @GetMapping("/wall")
     public String viewWall(Model model, @ModelAttribute NewMessage newMessage) {
+        
+        accountFreezeService.checkIfFrozen(model);
 
         messageService.addAttributesToModelForPageWall(model);
 
@@ -53,7 +52,9 @@ public class MessageController {
 
             return "messageNotFound";
         }
-
+        
+        accountFreezeService.checkIfFrozen(model);
+                
         messageService.addAttributesToModelForPageMessage(model, id);
 
         return "message";

@@ -14,6 +14,11 @@
         <div th:replace="fragments/layout :: sidebar"></div>
 
         <div class="container" style="margin-top:30px" th:unless="${authorBlockedUsernames.contains(currentSaunoja.username)}" >
+            
+            <div th:if="${currentSaunoja.roles.contains('FROZEN')}">
+                <h3 th:unless="${accountFreeze.expires == null}" style="color: #FF0000" th:text="${accountFreeze.author.username + ' on laittanut sinut avantoon huonon käytöksen vuoksi. Olet avannossa ' + #temporals.format(accountFreeze.expires, 'd.M.yy HH:mm') + ' saakka.'}"  ></h3>
+                <h3 th:if="${accountFreeze.expires == null}" style="color: #FF0000" th:text="${accountFreeze.author.username + ' on laittanut sinut avantoon huonon käytöksen vuoksi. Olet vaipunut horrokseen ikusiksi ajoiksi tai kunnes saunan henget päättävät ottaa sinut takaisin saunaan virkoamaan.'}"  ></h3>
+            </div>
 
             <div class="w3-container w3-card w3-white w3-round w3-section">
 
@@ -30,13 +35,13 @@
 
                     <button th:unless="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addAdmin').click()"><i class="fa fa-thumbs-up"></i> tee ADMIN </button>
                     <button th:if="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeAdmin').click()"><i class="fa fa-thumbs-up"></i> peru ADMIN </button>
-                    
+
                     <button th:unless="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('addGod').click()"><i class="fa fa-thumbs-up"></i> tee GOD </button>
                     <button th:if="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('removeGod').click()"><i class="fa fa-thumbs-up"></i> peru GOD </button>
-                    
+
                     <br/>
                     <br/>
-                    
+
                     <hr class="w3-clear"/>
 
                 </div>
@@ -64,6 +69,36 @@
                         <input type="submit" style="display:none" id="removeGod"/>
                     </form>
                 </div>
+
+                <!--ACCOUNT FREEZING-->
+
+                <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
+
+                    <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/freeze'}" method="POST">
+                        <input type="text" name="timeToExpiration" placeholder="kuinka monta..."/>
+                        <p><input type="radio" name="timeUnit" value="min"/> &nbsp; minuuttia </p>
+                        <p><input type="radio" name="timeUnit" value="h"/> &nbsp; tuntia </p>
+                        <p><input type="radio" name="timeUnit" value="d"/> &nbsp; päivää </p>
+                        <p><input type="radio" name="timeUnit" value="forever" checked="checked"/> &nbsp; toistaiseksi </p>
+                        <input type="submit" style="display:none" id="addFrozen"/>
+                    </form>
+
+                    <button th:unless="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addFrozen').click()"><i class="fa fa-thumbs-up"></i> Jäädytä tili </button>
+                    <button th:if="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeFrozen').click()"><i class="fa fa-thumbs-up"></i> Avaa tili </button>
+
+                    <br/>
+                    <br/>
+
+                    <hr class="w3-clear"/>
+
+                </div>
+
+                <div>
+                    <form sec:authorize="hasAuthority('GOD')" th:if="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/unfreeze'}" method="POST">
+                        <input type="submit" style="display:none" id="removeFrozen"/>
+                    </form>
+                </div>
+
 
                 <!-- PROFILE PICTURE -->
 
@@ -136,7 +171,7 @@
 
             <!-- ADD NEW PHOTO -->
 
-            <div class="container" style="margin-top:30px">
+            <div th:unless="${currentSaunoja.roles.contains('FROZEN')}" class="container" style="margin-top:30px">
 
                 <div>
 

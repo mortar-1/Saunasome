@@ -137,9 +137,9 @@ public class SaunojaService {
 
             bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus on varattu.");
         }
-        
+
         if (newSaunoja.getUsername().contains(" ")) {
-            
+
             bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus ei saa sisältää välilyöntejä.");
         }
 
@@ -363,6 +363,31 @@ public class SaunojaService {
             }
         }
 
+        if (action.equals("addFrozen")) {
+
+            if (!saunoja.getRoles().contains("FROZEN")) {
+
+                saunoja.getRoles().add("FROZEN");
+            }
+        }
+
+        if (action.equals("removeFrozen")) {
+
+            if (saunoja.getRoles().contains("FROZEN")) {
+
+                saunoja.getRoles().remove("FROZEN");
+            }
+        }
+
+        saunojaRepository.save(saunoja);
+    }
+    
+    public void removeFreezeFromRoles(String username) {
+        
+        Saunoja saunoja = getByUsername(username);
+        
+        saunoja.getRoles().remove("FROZEN");
+        
         saunojaRepository.save(saunoja);
     }
 

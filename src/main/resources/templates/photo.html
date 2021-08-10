@@ -11,6 +11,10 @@
 
         <div  class="container" style="margin-top:30px" th:unless="${authorBlockedUsernames.contains(currentSaunoja.username)}">
 
+            <div th:if="${currentSaunoja.roles.contains('FROZEN')}">
+                <h3 th:unless="${accountFreeze.expires == null}" style="color: #FF0000" th:text="${accountFreeze.author.username + ' on laittanut sinut avantoon huonon käytöksen vuoksi. Olet avannossa ' + #temporals.format(message.created, 'd.M.yy HH:mm') + ' saakka.'}"  ></h3>
+                <h3 th:if="${accountFreeze.expires == null}" style="color: #FF0000" th:text="${accountFreeze.author.username + ' on laittanut sinut avantoon huonon käytöksen vuoksi. Olet vaipunut horrokseen ikusiksi ajoiksi tai kunnes saunan henget päättävät ottaa sinut takaisin saunaan virkoamaan.'}"  ></h3>
+            </div>
 
 
 
@@ -77,7 +81,7 @@
 
             <div>
 
-                <div class="w3-container w3-card w3-white w3-round w3-margin">
+                <div th:unless="${currentSaunoja.roles.contains('FROZEN')}" class="w3-container w3-card w3-white w3-round w3-margin">
                     <br/>
 
                     <form method="POST" th:action="@{'/photo/' + ${photo.Id} + '/comment'}" id="newCommentForm" th:object="${newComment}">

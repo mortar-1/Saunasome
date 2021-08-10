@@ -72,6 +72,7 @@ public class PhotoService {
         photoRepository.save(photo);
     }
 
+    @PreAuthorize("hasAuthority('USER') and !hasAuthority('FROZEN')")
     public void addNewPhoto(Saunoja author, byte[] content, String description, boolean isProfilepicture, boolean isDefaultphoto) throws IOException {
 
         if (photoRepository.findByAuthor(author).size() < 10) {

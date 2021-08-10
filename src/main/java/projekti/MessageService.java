@@ -57,6 +57,7 @@ public class MessageService {
         return !messageRepository.existsById(id);
     }
 
+    @PreAuthorize("hasAuthority('USER') and !hasAuthority('FROZEN')")
     public void postNew(String newMessageContent) {
 
         Message message = newEmptyMessage();

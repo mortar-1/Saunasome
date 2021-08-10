@@ -27,6 +27,9 @@ public class SaunojaController {
 
     @Autowired
     private SaunojaService saunojaService;
+    
+    @Autowired
+    private AccountFreezeService accountFreezeService;
 
     private List<Saunoja> saunojat = new ArrayList<>();
 
@@ -72,6 +75,8 @@ public class SaunojaController {
 
             return "saunojaNotFound";
         }
+        
+        accountFreezeService.checkIfFrozen(model);
 
         saunojaService.addAttributesToModelForPageSaunoja(model, username);
 

@@ -27,7 +27,7 @@ public class PhotoController {
     private PhotoService photoService;
 
     @Autowired
-    private CommentService commentService;
+    private AccountFreezeService accountFreezeService;
 
     @Autowired
     private SaunojaService saunojaService;
@@ -51,6 +51,8 @@ public class PhotoController {
 
             return "photoNotFound";
         }
+
+        accountFreezeService.checkIfFrozen(model);
 
         photoService.addAttributesToModelForPagePhoto(model, id);
 
