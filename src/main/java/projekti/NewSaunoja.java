@@ -14,15 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class NewSaunoja {
 
     @NotEmpty
-    @Size(min = 2, max = 20)
+    @Size(min = 2, max = 50)
     private String firstName;
 
     @NotEmpty
     @Size(min = 2, max = 50)
     private String lastName;
-
-    @NotEmpty
-    @Size(min = 2, max = 20)
+    
     private String username;
 
     @ValidPassword

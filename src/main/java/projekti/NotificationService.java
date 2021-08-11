@@ -1,8 +1,11 @@
 package projekti;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 @Service
@@ -13,6 +16,15 @@ public class NotificationService {
 
     @Autowired
     private SaunojaService saunojaService;
+
+    public void addAttributesToModelForPageNotifications(Model model) {
+
+        addNotificationsForAdminToModel(model);
+
+        saunojaService.addCurrentSaunojaToModel(model);
+
+        saunojaService.addFollowingFollowedByBlockedToModel(model);
+    }
 
     public void newNotification(String username, NewNotification newNotification) {
 
@@ -25,6 +37,8 @@ public class NotificationService {
         notification.setContent(newNotification.getContent());
 
         notification.setCreated(LocalDateTime.now());
+
+        notificationRepository.save(notification);
 
     }
 
@@ -43,12 +57,46 @@ public class NotificationService {
         return bindingResult.hasErrors();
     }
 
-    public void deleteNotification(Long id) {
+    @PreAuthorize("#usernameAuthor == authentication.principal.username or hasAuthority('ADMIN')")
+    public String deleteNotification(Long id, String usernameAuthor) {
 
         if (notificationRepository.existsById(id)) {
 
-            notificationRepository.deleteById(id);
+            Notification notification = notificationRepository.getOne(id);
 
+            Saunoja recipient = notification.getRecipient();
+
+            notificationRepository.delete(notification);
+
+            if (recipient != saunojaService.getCurrentSaunoja()) {
+
+                return "redirect:/notifications";
+            }
         }
+
+        return "redirect:/wall";
     }
+
+    public List<Notification> getNotificationsForCurrentSaunoja() {
+
+        Saunoja saunoja = saunojaService.getCurrentSaunoja();
+
+        return notificationRepository.findByRecipientOrderByCreated(saunoja);
+    }
+
+    public List<Notification> getNotificationsForAdmin() {
+
+        return notificationRepository.findAll();
+    }
+
+    public void addNotificationsForCurrentSaunojaToModel(Model model) {
+
+        model.addAttribute("notifications", getNotificationsForCurrentSaunoja());
+    }
+
+    public void addNotificationsForAdminToModel(Model model) {
+
+        model.addAttribute("notifications", getNotificationsForAdmin());
+    }
+
 }

@@ -57,8 +57,6 @@
                         <input type="submit" style="display:none" id="removeAdmin"/>
                     </form>
 
-                    <br/>
-
                     <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('GOD')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
                         <input type="hidden" name="action" th:value="addGod"/>
                         <input type="submit" style="display:none" id="addGod"/>
@@ -83,8 +81,8 @@
                         <input type="submit" style="display:none" id="addFrozen"/>
                     </form>
 
-                    <button th:unless="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addFrozen').click()"><i class="fa fa-thumbs-up"></i> Jäädytä tili </button>
-                    <button th:if="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeFrozen').click()"><i class="fa fa-thumbs-up"></i> Avaa tili </button>
+                    <button th:unless="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addFrozen').click()"><i class="fa fa-microphone-slash"></i> Jäädytä tili </button>
+                    <button th:if="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeFrozen').click()"><i class="fa fa-microphone"></i> Avaa tili </button>
 
                     <br/>
                     <br/>
@@ -111,11 +109,11 @@
 
                 <div th:if="${!saunoja.username.equals(currentSaunoja.username)}">
 
-                    <button th:unless="${followingUsernames.contains(saunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
-                    <button th:if="${followingUsernames.contains(saunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> Lakkaa kuuntelemasta</button>
+                    <button th:unless="${isfollowing}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
+                    <button th:if="${isfollowing}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> <span th:text="${'Lakkaa kuuntelemasta (kuunnellut ' + #temporals.format(followCreated, 'd.M.yy') + ' ->)'}"/> </button>
 
-                    <button th:unless="${blockedUsernames.contains(saunoja.username)}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i> Estä</button>
-                    <button th:if="${blockedUsernames.contains(saunoja.username)}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i> Lopeta esto</button>
+                    <button th:unless="${isBlocking}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i> Estä</button>
+                    <button th:if="${isBlocking}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i> <span th:text="${'Lopeta esto (estänyt ' + #temporals.format(blockCreated, 'd.M.yy') + ' ->)'}"/></button>
 
                     <br/>
                     <br/>
@@ -123,28 +121,28 @@
 
                 </div>
 
-                <div th:unless="${followingUsernames.contains(saunoja.username)}">
+                <div th:unless="${isfollowing}">
                     <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
                         <input type="hidden" name="action" value="follow"/>
                         <input type="submit" style="display:none" id="follow"/>
                     </form>
                 </div>
 
-                <div th:if="${followingUsernames.contains(saunoja.username)}">
+                <div th:if="${isfollowing}">
                     <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
                         <input type="hidden" name="action" value="unfollow"/>
                         <input type="submit" style="display:none" id="unfollow"/>
                     </form>
                 </div>
 
-                <div th:unless="${blockedUsernames.contains(saunoja.username)}">
+                <div th:unless="${isBlocking}">
                     <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
                         <input type="hidden" name="action" value="block"/>
                         <input type="submit" style="display:none" id="block"/>
                     </form>
                 </div>
 
-                <div th:if="${blockedUsernames.contains(saunoja.username)}">
+                <div th:if="${isBlocking}">
                     <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
                         <input type="hidden" name="action" value="unblock"/>
                         <input type="submit" style="display:none" id="unblock"/>
@@ -152,8 +150,41 @@
                 </div>
 
             </div>
+            
+            <!-- PRIVATE MESSAGE FROM ADMIN -->
+            
+            <div sec:authorize="hasAuthority('ADMIN')" th:unless="${saunoja.username.equals(currentSaunoja.username)}" class="w3-container w3-card w3-white w3-round w3-section">
 
+                <br/>
 
+                <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}" id="newNotificationForm" th:object="${newNotification}">
+
+                    <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="alert alert-error">    
+                        Viestin virheviesti.
+                        <hr/>
+                    </div>
+
+                    <textarea th:placeholder="${'Lähetä ' + saunoja.username + ':lle yksityisilmoitus (enintään 200 merkkiä pitkä)'}" class="textarea" onkeyup="countChar(this)" name="content" form="newNotificationForm"></textarea>
+                    <div id="charNum"></div>
+
+                    <br/>
+                    <hr class="w3-clear"/>
+
+                    <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewNotification').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
+                    <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendTakeItEasyNotification').click()">"Korjaa käytöstäsi..." <i class="fa fa-arrow-circle-right"></i></button>
+                    
+                    <input type="submit" style="display: none" th:id="sendNewNotification"/>
+                </form>
+                
+                <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}">
+
+                    <input type="hidden" name="content" value="Korjaa käytöstäsi, tai sinut laitetaan avantoon!"/>
+                                                           
+                    <input type="submit" style="display: none" th:id="sendTakeItEasyNotification"/>
+                </form>
+
+            </div>
+            
 
             <!-- PHOTOS -->
 
@@ -171,7 +202,7 @@
 
             <!-- ADD NEW PHOTO -->
 
-            <div th:unless="${currentSaunoja.roles.contains('FROZEN')}" class="container" style="margin-top:30px">
+            <div th:unless="${!currentSaunoja.username.equals(saunoja.username) or currentSaunoja.roles.contains('FROZEN')}" class="container" style="margin-top:30px">
 
                 <div>
 
@@ -218,6 +249,8 @@
             <h3 th:text="${saunoja.username + ' on estänyt sinua näkemästä tätä sisältöä.'}"></h3>
         </div>
 
+        <script src="http://code.jquery.com/jquery-1.5.js"></script>
+        <script th:src="@{/javascript/charCount.js}"></script>
         <script th:src="@{/javascript/showChoosenFile.js}"></script>
     </body>
 </html>

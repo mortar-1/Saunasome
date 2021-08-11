@@ -118,10 +118,6 @@ public class SaunojaService {
         model.addAttribute("followedBy", followedBy);
 
         model.addAttribute("blocked", blocked);
-
-        model.addAttribute("followingUsernames", followingUsernames);
-
-        model.addAttribute("blockedUsernames", blockedUsernames);
     }
 
     public Boolean hasErrorsOnRegistration(NewSaunoja newSaunoja, BindingResult bindingResult) {
@@ -141,6 +137,11 @@ public class SaunojaService {
         if (newSaunoja.getUsername().contains(" ")) {
 
             bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus ei saa sisältää välilyöntejä.");
+        }
+                
+        if (newSaunoja.getUsername().length() < 2 || newSaunoja.getUsername().length() > 20 || newSaunoja.getUsername().isBlank()) {
+
+            bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnuksen pituden tulee olla välillä 2 - 20 merkkiä.");
         }
 
         if (newSaunoja.getPhoto().getSize() * binarybitesToMegabitesCoefficient >= 5) {
@@ -256,7 +257,7 @@ public class SaunojaService {
         return followRespository.findByFollowerAndFollowed(follower, followed) == null;
     }
 
-    public void addFollowingOrBlockingToModel(Model model, String objectUsername) {
+    public void addIsFollowingAndIsBlockingToModel(Model model, String objectUsername) {
 
         Saunoja subject = getCurrentSaunoja();
 
@@ -264,22 +265,26 @@ public class SaunojaService {
 
         if (!isNotFollowing(subject, object)) {
 
-            model.addAttribute("isfollowing", "kyllä (seuraaminen aloitettu: " + followingFromWhen(subject, object) + ").");
+            model.addAttribute("isfollowing", "true");
+            
+            model.addAttribute("followCreated", followingFromWhen(subject, object));
         }
 
         if (isNotFollowing(subject, object)) {
 
-            model.addAttribute("isfollowing", "ei.");
+            model.addAttribute("isfollowing", "false");
         }
 
         if (!haveNotBlocked(subject, object)) {
 
-            model.addAttribute("isblocked", "kyllä (estäminen aloitettu: " + blockingFromWhen(subject, object) + ").");
+            model.addAttribute("isBlocking", "true");
+            
+            model.addAttribute("blockCreated", blockingFromWhen(subject, object));
         }
 
         if (haveNotBlocked(subject, object)) {
 
-            model.addAttribute("isblocked", "ei");
+            model.addAttribute("isBlocking", "false");           
         }
     }
 
@@ -289,7 +294,7 @@ public class SaunojaService {
 
         photoService.addPhotosToModel(model, username);
 
-        addFollowingOrBlockingToModel(model, username);
+        addIsFollowingAndIsBlockingToModel(model, username);
 
         addCurrentSaunojaToModel(model);
 

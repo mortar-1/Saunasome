@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css"/>
         <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'/>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
     </head>
 
     <style th:fragment="style">
@@ -59,21 +59,21 @@
         <header th:fragment="navbar">
             <nav class="navbar navbar-expand-sm bg-info navbar-dark">
 
-                <a class="navbar-brand" th:href="@{/main}">Sauna</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                <a th:href="@{/main}"><img th:src="@{logo.png}" alt="Sauna" class="navbar-brand" style="height:45px"/></a>
                 <div class="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
+                        <li sec:authorize="hasAuthority('USER')" class="nav-item">
                             <a class="nav-link" th:href="@{/wall}">Lauteet</a>
                         </li>
-                        <li class="nav-item">
+                        <li sec:authorize="hasAuthority('USER')" class="nav-item">
                             <a class="nav-link" th:href="@{/saunojat}">Etsi saunoja</a>
                         </li>
-                        <li class="nav-item">
+                        <li sec:authorize="hasAuthority('USER')" class="nav-item">
                             <a class="nav-link" th:href="@{'/saunojat/' + ${#authentication.name}}">Oma profiili</a>
-                        </li> 
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')" class="nav-item">
+                            <a class="nav-link" th:href="@{/notifications}">Yksityisilmoitukset</a>
+                        </li>
                     </ul>
                 </div>  
             </nav>
@@ -85,7 +85,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-1">
-                        <img th:src="@{'/photo/' + ${currentSaunoja.profilepictureId}}" alt="Avatar" class="w3-circle" style="width:40px; height:40px" onclick="openSidebar()" />
+                        <img th:src="@{'/photo/' + ${currentSaunoja.profilepictureId}}" alt="Avatar" class="w3-circle" style="width:40px; height:40px" onclick="openOrCloseSidebar()" />
                     </div>
                     <div class="col-11">
                         <h5 th:text="${currentSaunoja.username}">Saunojan käyttäjätunnus</h5>
@@ -97,34 +97,35 @@
 
             </div>
 
-            <div class="w3-sidebar w3-bar-block w3-border-right" style="display:none" id="mySidebar">
-                <button onclick="closeSidebar()" class="w3-bar-item w3-large">Sulje &times;</button>
+            <div class="w3-sidebar w3-bar-block w3-border-right w3-border-top" style="display:none" id="mySidebar">
+
+                <button type="button" class="w3-bar-item w3-button w3-hover-none w3-hover-text-green" onclick="document.getElementById('logout').click()"> Kirjaudu ulos </button>
 
                 <form th:action="@{/logout}">
-                    <input type="submit" value="Kirjaudu ulos" />
+                    <input type="submit" id="logout" style="display:none" />
                 </form>
 
-                <h6>Kuuntelet: </h6>
+                <hr/>
 
-                <ul th:each="follow : ${following}">
-                    <li>
-                        <a th:href="@{'/saunojat/' + ${follow.followed.username}}" th:text="${follow.followed.username}">seurattava saunoja</a>
+                <h6>Kuuntelet: </h6>
+                <ul style="list-style-type:none; padding-left:0px">
+                    <li th:each="follow : ${following}">
+                        <a th:href="@{'/saunojat/' + ${follow.followed.username}}" class="w3-bar-item w3-button w3-hover-none w3-hover-text-green" th:text="${follow.followed.username}">seurattava saunoja</a>
                     </li>
                 </ul>
 
                 <h6>Sinua kuuntelee: </h6>
-
-                <ul>
-                    <li th:each="follow : ${followedBy}">
-                        <a th:href="@{'/saunojat/' + ${follow.follower.username}}"th:text="${follow.follower.username}">sinua seuraava saunoja</a>
+                <ul style="list-style-type:none; padding-left:0px">
+                    <li  th:each="follow : ${followedBy}">
+                        <a th:href="@{'/saunojat/' + ${follow.follower.username}}" class="w3-bar-item w3-button w3-hover-none w3-hover-text-green" th:text="${follow.follower.username}">sinua seuraava saunoja</a>
                     </li>
                 </ul>
 
 
-                <h6>Estetyt: </h6>
-                <ul>
+                <h6>Estät kuuntelemasta: </h6>
+                <ul style="list-style-type:none; padding-left:0px">
                     <li th:each="block : ${blocked}">
-                        <a th:href="@{'/saunojat/' + ${block.blocked.username}}"th:text="${block.blocked.username}">blokattu saunoja</a>
+                        <a th:href="@{'/saunojat/' + ${block.blocked.username}}" class="w3-bar-item w3-button w3-hover-none w3-hover-text-green" th:text="${block.blocked.username}">blokattu saunoja</a>
                     </li>
                 </ul>
 

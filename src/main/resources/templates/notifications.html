@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.springframework.org/security/tags">
+
+    <head th:replace="fragments/layout :: head"></head>
+
+    <style th:replace="fragments/layout :: style"/>
+
+    <body>
+
+        <header th:replace="fragments/layout :: navbar"/>
+
+        <div th:replace="fragments/layout :: sidebar"/>
+
+
+        <div class="container">
+
+            <!-- NOTIFICATIONS -->
+
+            <div th:each="notification : ${notifications}">
+                <div class="w3-container w3-card w3-white w3-round w3-margin">
+                    <br/>
+                    <span class="w3-right w3-opacity" th:unless="${notification.created.toLocalDate().equals(#temporals.createToday())}" th:text="${#temporals.format(notification.created, 'd.M.yy HH:mm')}">Viestin ajankohta</span>
+                    <span class="w3-right w3-opacity" th:if="${notification.created.toLocalDate().equals(#temporals.createToday())}" th:text="${' tänään ' + #temporals.format(notification.created, 'HH:mm')}">Viestin ajankohta</span>
+                    <a th:href="@{'/saunojat/' + ${notification.recipient.username}}"> <h6  th:text="${notification.author.username + ' -> ' +  notification.recipient.username + ':lle'}">Vastaanottaja</h6></a>
+
+                    <hr class="w3-clear"/>
+
+                    <p th:text="${notification.content}">Viestin sisältö</p>
+
+                    <br/>
+                    <hr class="w3-clear"/>
+
+                    <button type="button" class="w3-button w3-theme-d2 w3-margin-bottom" th:attr="onclick=|document.getElementById('delete' + ${notification.id}).click()|"><i class="fa fa-close"></i> Poista viesti</button>  
+                    <form method="POST" th:action="@{'/notifications/' + ${notification.Id} + '/delete'}">
+                        <input type="hidden" name="usernameAuthor" th:value="${notification.author.username}"/>
+                        <input type="submit" style="display:none;" th:id="${'delete' + notification.id}" />
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </body>
+</html>

@@ -21,53 +21,40 @@
 
                         <div th:if="${#fields.hasErrors('firstName')}" class="alert alert-error">    
                             Virheellinen etunimi.
-                            <hr/>
                         </div>
 
                         <div th:if="${#fields.hasErrors('lastName')}" class="alert alert-error">    
                             Virheellinen sukunimi.
-                            <hr/>
                         </div>
 
                         <div th:if="${#fields.hasErrors('username')}" class="alert alert-error" th:errors="*{username}"> 
                             Käyttäjätunnusvirheviesti
-                            <hr/>
                         </div>
 
                         <div th:if="${#fields.hasErrors('password')}" class="alert alert-error"> 
                             Virheellinen salasana.
-                            <hr/>
                         </div>
 
                         <div th:if="${#fields.hasErrors('confirmPassword')}" class="alert alert-error"> 
                             Salasanat eivät täsmää.
-                            <hr/>
                         </div>
 
                         <div th:if="${#fields.hasErrors('photo')}" class="alert alert-error"> 
                             Kuva on liian suuri ladattavaksi (Enintään 5MB).
-                            <hr/>
                         </div>
 
                         <hr/>
 
-                        <!--<label for="firstName">Etunimi</label>-->
-                        <input placeholder="Etunimi" type="text" id="firstName" name="firstName"/>
-
-                        <input placeholder="Sukunimi" type="text" id="lastName" name="lastName"/>
-
+                        <input placeholder="Etunimi" class="form-control" type="text" id="firstName" name="firstName"/>
                         <br/>
-                        <hr/>
-                      
-                        <input placeholder="Löylytunnus" type="text" id="username" name="username"/>
-
-                        <input autocomplete="new-password" placeholder="Salasana" type="password" id="password" name="password"/>
-
-                        <input placeholder="Salasana uudestaan" type="password" id="confirmPassword" name="confirmPassword"/>
-                        
+                        <input placeholder="Sukunimi" class="form-control" type="text" id="lastName" name="lastName"/>
                         <br/>
+                        <input placeholder="Löylytunnus" class="form-control" type="text" id="username" name="username"/>
                         <br/>
-                        
+                        <input autocomplete="new-password" placeholder="Salasana" class="form-control" type="password" id="password" name="password"/>
+                        <br/>
+                        <input placeholder="Salasana uudestaan" class="form-control" type="password" id="confirmPassword" name="confirmPassword"/>
+                        <br/>
                         <p class="w3-center">Salasanan oltava: vähintään 6 merkkiä pitkä, 1 iso kirjain, 1 erikoismerkki.</p>
 
                         <hr/>
@@ -81,7 +68,7 @@
 
                             <button type="submit" class="w3-button w3-theme-d1 w3-margin-bottom w3-right"><i class="fa fa-plus"></i> Luo saunoja!</button>
                         </div>
-                                               
+
                         <input type="file" name="photo" style="display:none;" id="file"/>
 
                     </fieldset>

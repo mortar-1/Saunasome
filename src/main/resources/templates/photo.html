@@ -21,11 +21,15 @@
             <div class="w3-container w3-card w3-white w3-round w3-section">
                 <br/>
 
+                <!-- USERNAME AND PROFILEPICTURE -->
+
                 <a th:href="@{'/saunojat/' + ${photo.author.username}}"><img th:src="@{'/photo/' + ${photo.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:60px; height:60px"/></a>            
                 <p th:text="${photo.author.username}"></p>
 
                 <br/>
                 <hr class="w3-clear"/>
+
+                <!-- NEXT AND/OR PREVIOUS -->
 
                 <div th:unless="${isLast and isFirst}">
 
@@ -39,20 +43,28 @@
 
                 </div>
 
+                <!-- SET AS PROFILEPICTURE -->
+
                 <button th:if="${photo.author.username == currentSaunoja.username and !photo.isProfilePicture}" type="button" class="w3-button center" onclick="document.getElementById('setAsProfilePicture').click()"><i class="material-icons" style="font-size: 20px">perm_identity</i> Aseta profiilikuvaksi </button>
+
+                <!-- PHOTO -->
+
                 <a th:href="@{'/saunojat/' + ${photo.author.username}}"><img class="center" th:src="@{'/photo/' + ${photo.Id} }" height="500"/></a>
 
                 <br/>
+
+                <p class="w3-center" th:text="${photo.description}">Kuvan kuvaus</p>
+
                 <hr class="w3-clear"/>
+
+                <!-- LIKE CONTROL -->
 
                 <button th:unless="${photo.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('likePhoto').click()"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(photo.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
                 <button th:if="${photo.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('unlikePhoto').click()"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(photo.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
                 <button th:if="${photo.author.username == currentSaunoja.username or currentSaunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-right" onclick="document.getElementById('deletePhoto').click()"><i class="fa fa-close"></i> Poista kuva </button>
 
                 <br/>
-                <hr class="w3-clear"/>
-
-                <p class="center" th:text="${photo.description}">Kuvan kuvaus</p>
+                <hr class="w3-clear"/>        
 
                 <form th:unless="${photo.likes.contains(currentSaunoja.username)}" method="POST" th:action="@{'/photo/' + ${photo.Id} + '/like'}">
                     <input type="hidden" name="action" th:value="like"/>
@@ -79,8 +91,9 @@
 
             <br/>
 
-            <div>
+            <!-- COMMENT -->
 
+            <div>
                 <div th:unless="${currentSaunoja.roles.contains('FROZEN')}" class="w3-container w3-card w3-white w3-round w3-margin">
                     <br/>
 
@@ -104,14 +117,19 @@
                     </form>
                 </div>
 
-                <h3>Vihtoneet: </h3>
-                <ol>
-                    <li th:each="likerUsername : ${photo.likes}">
-                        <a th:href="@{'/saunojat/' + ${likerUsername}}" th:text="${likerUsername}">Tykkäävä saunoja</a>
-                    </li>
-                </ol>
-
             </div>
+            
+            <!-- LIKES -->
+
+
+            <h3>Vihtoneet: </h3>
+            <ol>
+                <li th:each="likerUsername : ${photo.likes}">
+                    <a th:href="@{'/saunojat/' + ${likerUsername}}" th:text="${likerUsername}">Tykkäävä saunoja</a>
+                </li>
+            </ol>
+
+            <!-- COMMENTS -->
 
             <div th:each="comment : ${comments}">
                 <div class="w3-container w3-card w3-white w3-round w3-margin">
@@ -155,6 +173,8 @@
             </div>
 
         </div>
+        
+        <!-- IF BLOCKED -->
 
         <div class="container" th:if="${authorBlockedUsernames.contains(currentSaunoja.username)}">
             <h3 th:text="${photo.author.username + ' on estänyt sinua näkemästä tätä sisältöä.'}"></h3>

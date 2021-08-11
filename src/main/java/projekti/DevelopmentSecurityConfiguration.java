@@ -40,6 +40,8 @@ public class DevelopmentSecurityConfiguration extends WebSecurityConfigurerAdapt
                 .antMatchers("/h2-console", "/h2-console/**").permitAll()
                 .antMatchers("/main").permitAll()
                 .antMatchers("/register").permitAll()
+                .antMatchers("/logo.png").permitAll()
+                .antMatchers("/notifications").hasAuthority("ADMIN")
                 .antMatchers(HttpMethod.POST).authenticated()
                 .anyRequest().authenticated()
                 .and()

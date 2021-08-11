@@ -4,11 +4,15 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -27,7 +31,7 @@ public class SaunojaController {
 
     @Autowired
     private SaunojaService saunojaService;
-    
+
     @Autowired
     private AccountFreezeService accountFreezeService;
 
@@ -69,13 +73,13 @@ public class SaunojaController {
     }
 
     @GetMapping("/saunojat/{username}")
-    public String viewSaunoja(Model model, @PathVariable String username, @ModelAttribute NewPhoto newPhoto) {
+    public String viewSaunoja(Model model, @PathVariable String username, @ModelAttribute NewPhoto newPhoto, @ModelAttribute NewNotification newNotification) {
 
         if (saunojaRepository.findByUsername(username) == null) {
 
             return "saunojaNotFound";
         }
-        
+
         accountFreezeService.checkIfFrozen(model);
 
         saunojaService.addAttributesToModelForPageSaunoja(model, username);
@@ -98,16 +102,17 @@ public class SaunojaController {
     @PostMapping("/saunojat")
     public String findSaunoja(@RequestParam String string) {
 
-        saunojat = saunojaRepository.findByFirstNameIgnoreCaseContainingOrLastNameIgnoreCaseContainingOrUsernameIgnoreCaseContaining(string, string, string);
+        saunojat = saunojaRepository.findByFirstNameIgnoreCaseContainingOrLastNameIgnoreCaseContainingOrUsernameIgnoreCaseContainingOrderByUsername(string, string, string);
+
+        Collections.sort(saunojat);
 
         return "redirect:/saunojat";
-
     }
 
     @Transactional
     @PostMapping(path = "/saunojat/{username}/follow")
     public String follow(@RequestParam String action, @PathVariable String username) throws UnsupportedEncodingException {
-
+        
         Saunoja subject = saunojaService.getCurrentSaunoja();
 
         Saunoja object = saunojaService.getByUsername(username);

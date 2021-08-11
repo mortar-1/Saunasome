@@ -1,7 +1,8 @@
-function openSidebar() {
-  document.getElementById("mySidebar").style.display = "block";
-}
+function openOrCloseSidebar() {
 
-function closeSidebar() {
-  document.getElementById("mySidebar").style.display = "none";
+    if(document.getElementById("mySidebar").style.display=="none") {
+            document.getElementById("mySidebar").style.display = "block";
+    } else {
+           document.getElementById("mySidebar").style.display = "none";
+    }
 }

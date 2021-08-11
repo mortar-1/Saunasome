@@ -31,10 +31,14 @@ public class Saunoja extends AbstractPersistable<Long> implements Comparable<Sau
     
     private Long profilepictureId;
     
+    
     @Override
     public int compareTo(Saunoja other) {
         
-        return username.compareTo(other.username);
+        return username.compareToIgnoreCase(other.username);
     }
-
+    
+    
+   
+       
 }

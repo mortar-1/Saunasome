@@ -10,18 +10,26 @@
 
         <div class="container" style="margin-top:30px">
 
-            <h2>Saunojat</h2>
+            <div>
+                <form th:action="@{/saunojat}" method="post">               
+                    <fieldset>
+                        <legend>Etsi saunojia!</legend>
+                        <input type="text" class="form-control" name="string" placeholder="Löylytunnus/etunimi/sukunimi"/>
+                        <input type="submit" id="find" style="display:none"/>
+                        <div class="form-actions">
+                            <button class="btn" onclick="document.getElementById('find').click()"> <i class="fa fa-search" style="font-size:20px"></i> Etsi</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
 
-            <form method="POST" th:action="@{/saunojat}">
-                <p>Etunimi/sukunimi/käyttäjätunnus: <input type="text" name="string"/></p>
-                <input type="submit" value="Etsi käyttäjää"/>
-            </form>
+            <br/>
 
-            <ol>
+            <ul>
                 <li th:each="saunoja : ${saunojat}">
-                    <a th:href="${'/saunojat/' + saunoja.username}" th:text="${saunoja.username}">msg</a>
+                    <a th:href="${'/saunojat/' + saunoja.username}" th:text="${saunoja.username + ' (' + saunoja.firstName + ' ' + saunoja.lastName + ')'}">msg</a>
                 </li>
-            </ol>
+            </ul>
 
         </div>
     </body>

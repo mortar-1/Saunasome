@@ -27,6 +27,9 @@ public class MessageService {
     
     @Autowired
     private CommentService commentService;
+    
+    @Autowired
+    private NotificationService notificationService;
         
     public void addAttributesToModelForPageWall(Model model) {
         
@@ -37,6 +40,8 @@ public class MessageService {
         saunojaService.addCurrentSaunojaToModel(model);
 
         saunojaService.addFollowingFollowedByBlockedToModel(model);
+        
+        notificationService.addNotificationsForCurrentSaunojaToModel(model);
     }
     
     public void addAttributesToModelForPageMessage(Model model, Long id) {
@@ -117,7 +122,7 @@ public class MessageService {
         message.setAuthor(saunojaService.getByUsername("Ahti"));
 
         message.setContent("Tervetuloa leppoisaan seuraamme " + saunojaService.getCurrentUsername()
-                + "! Istut nyt lauteilla ja täällä kuulet kaikki vitsit ja tarinat niiltä saunojilta, joita sinä päätät kuunnella.");
+                + "! Istut nyt lauteilla. Täällä kuulet kaikki vitsit ja tarinat niiltä saunojilta, joita sinä päätät kuunnella. Klikkaamalla omaa profiilikuvaasi sivun ylälaidassa, saat näkyviin ne saunojat joita sinä kuuntelet ja jotka kuuntelevat sinua. Hyviä löylyjä!");
 
         model.addAttribute("welcomeMessage", message);
     }
