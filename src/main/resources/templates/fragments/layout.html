@@ -59,7 +59,7 @@
         <header th:fragment="navbar">
             <nav class="navbar navbar-expand-sm bg-info navbar-dark">
 
-                <a th:href="@{/main}"><img th:src="@{logo.png}" alt="Sauna" class="navbar-brand" style="height:45px"/></a>
+                <a th:href="@{/main}"><img th:src="@{/logo.png}" alt="Sauna" class="navbar-brand" style="height:45px"/></a>
                 <div class="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul class="navbar-nav">
                         <li sec:authorize="hasAuthority('USER')" class="nav-item">

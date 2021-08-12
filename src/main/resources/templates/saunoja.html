@@ -24,8 +24,8 @@
 
                 <!-- USERNAME AND NAME -->
 
-                <h2 th:text="${saunoja.username}">Nimimerkki</h2>
-                <h4 th:text="${saunoja.firstName + ' ' + saunoja.lastName}">Nimi</h4>
+                <h1 th:text="${saunoja.username}" style="font-family: 'Harrington'; color: green" class="w3-center">Nimimerkki</h1>
+                <h3 th:text="${saunoja.firstName + ' ' + saunoja.lastName}" style="font-family: 'Harrington'; color: green" class="w3-center">Nimi</h3>
 
                 <hr class="w3-clear"/>
 
@@ -149,61 +149,76 @@
                     </form>
                 </div>
 
-            </div>
 
-            <!-- PRIVATE MESSAGE FROM ADMIN -->
 
-            <div sec:authorize="hasAuthority('ADMIN')" th:unless="${saunoja.username.equals(currentSaunoja.username)}" class="w3-container w3-card w3-white w3-round w3-section">
+                <!-- PRIVATE MESSAGE FROM ADMIN -->
 
-                <br/>
+                <div sec:authorize="hasAuthority('ADMIN')" th:unless="${saunoja.username.equals(currentSaunoja.username)}">
 
-                <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}" id="newNotificationForm" th:object="${newNotification}">
-
-                    <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="alert alert-error">    
-                        Viestin virheviesti.
-                        <hr/>
-                    </div>
-
-                    <textarea th:placeholder="${'Lähetä ' + saunoja.username + ':lle yksityisilmoitus (enintään 200 merkkiä pitkä)'}" class="textarea" onkeyup="countChar(this)" name="content" form="newNotificationForm"></textarea>
-                    <div id="charNum"></div>
-
-                    <p><input type="radio" name="isAlert" value="false" checked="checked"/> &nbsp; neutraali </p>
-                    <p><input type="radio" name="isAlert" value="true"/> &nbsp; vihainen </p>
-                    
                     <br/>
-                    <hr class="w3-clear"/>
 
-                    <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewNotification').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
-                    <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendTakeItEasyNotification').click()">"Korjaa käytöstäsi..." <i class="fa fa-arrow-circle-right"></i></button>
+                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}" id="newNotificationForm" th:object="${newNotification}">
 
-                    <input type="submit" style="display: none" th:id="sendNewNotification"/>
-                </form>
+                        <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="alert alert-error">    
+                            Viestin virheviesti.
+                            <hr/>
+                        </div>
 
-                <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}">
+                        <textarea th:placeholder="${'Lähetä ' + saunoja.username + ':lle yksityisilmoitus (enintään 200 merkkiä pitkä)'}" class="textarea" onkeyup="countChar(this)" name="content" form="newNotificationForm"></textarea>
+                        <div id="charNum"></div>
 
-                    <input type="hidden" name="content" value="Korjaa käytöstäsi, tai sinut laitetaan avantoon!"/>
+                        <p><input type="radio" name="isAlert" value="false" checked="checked"/> &nbsp; neutraali </p>
+                        <p><input type="radio" name="isAlert" value="true"/> &nbsp; vihainen </p>
 
-                    <input type="hidden" name="isAlert" value="=true"/>
+                        <br/>
+                        <hr class="w3-clear"/>
 
-                    <input type="submit" style="display: none" th:id="sendTakeItEasyNotification"/>
-                </form>
+                        <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('sendNewNotification').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
+                        <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-right" onclick="document.getElementById('sendTakeItEasyNotification').click()">"Korjaa käytöstäsi..." <i class="fa fa-arrow-circle-right"></i></button>
+
+                        <input type="submit" style="display: none" th:id="sendNewNotification"/>
+                    </form>
+
+                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}">
+
+                        <input type="hidden" name="content" value="Korjaa käytöstäsi, tai sinut laitetaan avantoon!"/>
+
+                        <input type="hidden" name="isAlert" value="=true"/>
+
+                        <input type="submit" style="display: none" th:id="sendTakeItEasyNotification"/>
+                    </form>
+
+                </div>
 
             </div>
 
 
             <!-- PHOTOS -->
 
-            <div class="row" th:unless="${authorBlockedUsernames.contains(currentSaunoja.username) and !currentSaunoja.roles.contains('ADMIN')}">
+            <br/>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center" style="font-family: 'Harrington'; color: green">KUVA-ALBUMI</h2>
+                    <hr class="w3-clear"/>
+                    <div class="row justify-content-center text-center" th:unless="${authorBlockedUsernames.contains(currentSaunoja.username) and !currentSaunoja.roles.contains('ADMIN')}">
+                        <div class="col-4"  th:each="photo : ${photos}">
 
-                <div class="col-4"  th:each="photo : ${photos}">
+                            <figure class="figure">
+                                <a th:href="@{'/photo/' + ${photo.Id} + '/view'}"><img class="figure-img img-thumbnail" th:src="@{'/photo/' + ${photo.Id} }" height="100"/></a>
+                                <figcaption class="figure-caption" th:text="${photo.description}">Tarina</figcaption>
+                            </figure>
 
-                    <a th:href="@{'/photo/' + ${photo.Id} + '/view'}"><img th:src="@{'/photo/' + ${photo.Id} }" height="100"/></a>
-
+                        </div>
+                    </div>
                 </div>
 
             </div>
 
             <br/>
+
+
+
+
 
             <!-- ADD NEW PHOTO -->
 
@@ -215,7 +230,7 @@
                         <fieldset>
                             <legend>Lisää uusi kuva</legend>
 
-                            <div th:if="${#fields.hasErrors('photo')}" class="alert alert-error" th:errors="*{photo}"> 
+                            <div th:if="${#fields.hasErrors('photo')}" class="alert alert-error" style="color: red" th:errors="*{photo}"> 
                                 Kuva virhe.
                             </div>
 
@@ -227,11 +242,13 @@
 
                                 <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('file').click()" style="white-space: nowrap"><i class="fa fa-file-image-o w3-left"></i> &nbsp; Valitse kuva </button>
 
-                                <div id="file-filename" class="w3-right"></div>
+                                <div  id="file-filename" class="w3-right" style="color: greenyellow"></div>
 
                             </div>
 
-                            <textarea placeholder="Kuvan tarina... (enintään 100 merkkiä)" class="textarea" name="description" form="newPhoto"></textarea>
+                            <textarea placeholder="Lyhyt kuvaus (enintään 100 merkkiä)." class="textarea" onkeyup="countChar(this)" name="description" form="newPhoto" th:text="${descriptionFromBefore}" ></textarea>
+
+                            <div id="charNum"></div>
 
                             <input type="file" name="photo" style="display:none;" id="file"/>
 

@@ -63,6 +63,8 @@ public class SaunojaController {
         if (saunojaService.hasErrorsOnRegistration(newSaunoja, bindingResult)) {
 
             saunojaService.addCurrentSaunojaToModel(model);
+            
+            saunojaService.addValuesFromBeforeToModel(model, newSaunoja);
 
             return "register";
         }

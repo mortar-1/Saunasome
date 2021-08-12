@@ -56,6 +56,13 @@
                     <input type="submit" style="display:none;" th:id="${'unlike' + message.id}"/>
                 </form>
             </div>
+            
+            <h5 th:unless="${message.likes.isEmpty()}">Vihtoneet: </h5>
+            <ol>
+                <li th:each="likerUsername : ${message.likes}">
+                    <a th:href="@{'/saunojat/' + ${likerUsername}}" th:text="${likerUsername}">Tykkäävä saunoja</a>
+                </li>
+            </ol>
 
             <div th:unless="${currentSaunoja.roles.contains('FROZEN')}" class="w3-container w3-card w3-white w3-round w3-margin">
 
@@ -83,12 +90,7 @@
             </div>
 
 
-            <h3>Vihtoneet: </h3>
-            <ol>
-                <li th:each="likerUsername : ${message.likes}">
-                    <a th:href="@{'/saunojat/' + ${likerUsername}}" th:text="${likerUsername}">Tykkäävä saunoja</a>
-                </li>
-            </ol>
+            
 
 
             <div th:each="comment : ${comments}">

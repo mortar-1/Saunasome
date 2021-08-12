@@ -33,11 +33,10 @@
 
                 <div th:unless="${isLast and isFirst}">
 
-                    <a th:unless="${isFirst}"  th:href="@{'/photo/' + ${previousId} + '/view'}"><button type="button" class="w3-button w3-theme-d1 w3-margin-bottom"><i class="fa fa-angle-double-left"></i> Edellinen kuva </button></a>
-                    <div th:unless="${isLast}">
-                        <a th:href="@{'/photo/' + ${nextId} + '/view'}"><button  type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-right" >Seuraava kuva <i class="fa fa-angle-double-right"></i></button></a>
-                        <br/>
-                    </div>
+                    <a th:unless="${isFirst}"  th:href="@{'/photo/' + ${previousId} + '/view'}"><button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left"><i class="fa fa-angle-double-left"></i> Edellinen kuva </button></a>
+
+                    <a th:unless="${isLast}" th:href="@{'/photo/' + ${nextId} + '/view'}"><button  type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-right" >Seuraava kuva <i class="fa fa-angle-double-right"></i></button></a>
+
                     <br/>
                     <hr class="w3-clear"/>
 
@@ -89,7 +88,16 @@
 
             </div>
 
-            <br/>
+
+            <!-- LIKES -->
+
+
+            <h5 th:unless="${photo.likes.isEmpty()}">Vihtoneet: </h5>
+            <ol>
+                <li th:each="likerUsername : ${photo.likes}">
+                    <a th:href="@{'/saunojat/' + ${likerUsername}}" th:text="${likerUsername}">Tykkäävä saunoja</a>
+                </li>
+            </ol>
 
             <!-- COMMENT -->
 
@@ -118,16 +126,6 @@
                 </div>
 
             </div>
-            
-            <!-- LIKES -->
-
-
-            <h3>Vihtoneet: </h3>
-            <ol>
-                <li th:each="likerUsername : ${photo.likes}">
-                    <a th:href="@{'/saunojat/' + ${likerUsername}}" th:text="${likerUsername}">Tykkäävä saunoja</a>
-                </li>
-            </ol>
 
             <!-- COMMENTS -->
 
@@ -173,7 +171,7 @@
             </div>
 
         </div>
-        
+
         <!-- IF BLOCKED -->
 
         <div class="container" th:if="${authorBlockedUsernames.contains(currentSaunoja.username)}">

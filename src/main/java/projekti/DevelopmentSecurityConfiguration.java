@@ -29,18 +29,18 @@ public class DevelopmentSecurityConfiguration extends WebSecurityConfigurerAdapt
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-       
-        
+
         http.csrf().disable();
         http.headers().frameOptions().sameOrigin();
 
         http.authorizeRequests()
                 .antMatchers("/").permitAll()
+                .antMatchers("/logo.png").permitAll()
                 .antMatchers("/css/**").permitAll()
+                .antMatchers("/javascript/**").permitAll()
                 .antMatchers("/h2-console", "/h2-console/**").permitAll()
                 .antMatchers("/main").permitAll()
                 .antMatchers("/register").permitAll()
-                .antMatchers("/logo.png").permitAll()
                 .antMatchers("/notifications").hasAuthority("ADMIN")
                 .antMatchers(HttpMethod.POST).authenticated()
                 .anyRequest().authenticated()
@@ -64,7 +64,7 @@ public class DevelopmentSecurityConfiguration extends WebSecurityConfigurerAdapt
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        
+
         return new BCryptPasswordEncoder();
     }
 }

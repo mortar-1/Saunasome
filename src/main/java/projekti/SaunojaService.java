@@ -155,6 +155,15 @@ public class SaunojaService {
         return bindingResult.hasErrors();
     }
 
+    public void addValuesFromBeforeToModel(Model model, NewSaunoja newSaunoja) {
+
+        model.addAttribute("firstNameFromBefore", newSaunoja.getFirstName());
+
+        model.addAttribute("lastNameFromBefore", newSaunoja.getLastName());
+
+        model.addAttribute("usernameFromBefore", newSaunoja.getUsername());
+    }
+
     public void createNewAccount(String username, String password, String firstName, String lastName, MultipartFile photo)
             throws IOException {
 
@@ -382,12 +391,12 @@ public class SaunojaService {
         if (action.equals("addFrozen")) {
 
             if (!saunoja.getRoles().contains("FROZEN")) {
-                
+
                 if (saunoja.getRoles().contains("ADMIN")) {
 
                     saunoja.getRoles().remove("ADMIN");
                 }
-                
+
                 if (saunoja.getRoles().contains("GOD")) {
 
                     saunoja.getRoles().remove("GOD");
@@ -402,7 +411,7 @@ public class SaunojaService {
         if (action.equals("removeFrozen")) {
 
             if (saunoja.getRoles().contains("FROZEN")) {
-                
+
                 saunoja.getRoles().remove("FROZEN");
 
                 notificationService.newNotification(username, new NewNotification("Sinut otettiin takaisin avannosta.", Boolean.FALSE));

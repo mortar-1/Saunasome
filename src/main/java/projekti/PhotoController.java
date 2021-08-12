@@ -62,14 +62,18 @@ public class PhotoController {
     @PostMapping("/saunojat/{username}/photo")
     public String addPhoto(Model model, @PathVariable String username, @Valid @ModelAttribute NewPhoto newPhoto, @RequestParam(defaultValue = "false") boolean isProfilepicture, BindingResult bindingResult) throws IOException {
 
-        if (photoService.hasErrorsOnAddingNewPhoto(newPhoto, bindingResult)) {
+        Saunoja author  = saunojaService.getByUsername(username);
+        
+        if (photoService.hasErrorsOnAddingNewPhoto(author, newPhoto, bindingResult)) {
 
             saunojaService.addAttributesToModelForPageSaunoja(model, username);
+                        
+            model.addAttribute("descriptionFromBefore", newPhoto.getDescription());
 
             return "saunoja";
         }
 
-        photoService.addNewPhoto(saunojaService.getCurrentSaunoja(), newPhoto.getPhoto().getBytes(), newPhoto.getDescription(), isProfilepicture, false);
+        photoService.addNewPhoto(author, newPhoto.getPhoto().getBytes(), newPhoto.getDescription(), isProfilepicture, false);
 
         return "redirect:/saunojat/" + username;
     }

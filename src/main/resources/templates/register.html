@@ -23,19 +23,22 @@
                         <div th:if="${#fields.hasErrors('firstName')}" class="alert alert-error" style="color: red">    
                             Virheellinen etunimi.
                         </div>
-                        <input placeholder="Etunimi" class="form-control" type="text" id="firstName" name="firstName"/>
+                        <input th:unless="${#fields.hasErrors('firstName')}" placeholder="Etunimi" class="form-control" type="text" id="firstName" name="firstName" th:value="${firstNameFromBefore}"/>
+                        <input th:if="${#fields.hasErrors('firstName')}" placeholder="Etunimi" class="form-control" type="text" id="firstName" name="firstName"/>
                         <br/>
 
                         <div th:if="${#fields.hasErrors('lastName')}" class="alert alert-error" style="color: red">    
                             Virheellinen sukunimi.
                         </div>
-                        <input placeholder="Sukunimi" class="form-control" type="text" id="lastName" name="lastName"/>
+                        <input th:unless="${#fields.hasErrors('lastName')}" placeholder="Sukunimi" class="form-control" type="text" id="lastName" name="lastName" th:value="${lastNameFromBefore}"/>
+                        <input th:if="${#fields.hasErrors('lastName')}" placeholder="Sukunimi" class="form-control" type="text" id="lastName" name="lastName"/>
                         <br/>
 
                         <div th:if="${#fields.hasErrors('username')}" class="alert alert-error" style="color: red" th:errors="*{username}"> 
                             Löylytunnusvirheviesti
                         </div>
-                        <input placeholder="Löylytunnus" class="form-control" type="text" id="username" name="username"/>
+                        <input th:unless="${#fields.hasErrors('username')}" placeholder="Löylytunnus" class="form-control" type="text" id="username" name="username" th:value="${usernameFromBefore}"/>
+                        <input th:if="${#fields.hasErrors('username')}" placeholder="Löylytunnus" class="form-control" type="text" id="username" name="username"/>
                         <br/>
 
                         <div th:if="${#fields.hasErrors('password')}" class="alert alert-error" style="color: red"> 
@@ -53,7 +56,7 @@
                         <hr/>
 
 
-                        <div id="file-filename"></div>
+                        <div id="file-filename" style="color: greenyellow"></div>
                         <br/>
 
                         <div>
@@ -74,33 +77,6 @@
             </div>
 
         </div>
-
-
-        <!--
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <script src="pwstrength.js"></script>                  
-        <script type="text/javascript">
-            $(document).ready(function () {
-            options = {
-            common: {minChar:8},
-            ui: {
-            showVerdictsInsideProgressBar:true,
-            showErrors:true,
-            errorMessages:{
-            wordLength: '<spring:message code="error.wordLength"/>',
-            wordNotEmail: '<spring:message code="error.wordNotEmail"/>',
-            wordSequences: '<spring:message code="error.wordSequences"/>',
-            wordLowercase: '<spring:message code="error.wordLowercase"/>',
-            wordUppercase: '<spring:message code="error.wordUppercase"/>',
-            wordOneNumber: '<spring:message code="error.wordOneNumber"/>',
-            wordOneSpecialChar: '<spring:message code="error.wordOneSpecialChar"/>'
-            }
-            }
-            };
-            $('#password').pwstrength(options);
-            });
-        </script>
-        -->
 
         <script th:src="@{/javascript/showChoosenFile.js}"></script>
     </body>

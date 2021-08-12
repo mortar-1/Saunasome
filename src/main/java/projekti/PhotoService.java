@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -25,7 +26,7 @@ public class PhotoService {
 
     @Autowired
     private MessageService messageService;
-    
+
     @Autowired
     private CommentService commentService;
 
@@ -72,10 +73,15 @@ public class PhotoService {
         photoRepository.save(photo);
     }
 
+    public Boolean hasTenPictures(Saunoja author) {
+
+        return photoRepository.findByAuthor(author).size() == 10;
+    }
+
     @PreAuthorize("hasAuthority('USER') and !hasAuthority('FROZEN')")
     public void addNewPhoto(Saunoja author, byte[] content, String description, boolean isProfilepicture, boolean isFirstPhoto) throws IOException {
 
-        if (photoRepository.findByAuthor(author).size() < 10) {
+        if (!hasTenPictures(author)) {
 
             Photo photo = createNewPhoto(author, content);
 
@@ -105,7 +111,7 @@ public class PhotoService {
         }
     }
 
-    public Boolean hasErrorsOnAddingNewPhoto(NewPhoto newPhoto, BindingResult bindingResult) throws IOException {
+    public Boolean hasErrorsOnAddingNewPhoto(Saunoja author, NewPhoto newPhoto, BindingResult bindingResult) throws IOException {
 
         Double binarybitesToMegabitesCoefficient = 0.00000095367432;
 
@@ -122,6 +128,11 @@ public class PhotoService {
         if (newPhoto.getPhoto().getBytes().length == 0) {
 
             bindingResult.rejectValue("photo", "error.newSaunoja", "Et valinnut kuvaa.");
+        }
+
+        if (hasTenPictures(author)) {
+
+            bindingResult.rejectValue("photo", "error.newSaunoja", "Sinulla voi olla enimmillään 10 kuvaa. Poista jokin kuva, jotta voit lisätä uuden kuvan.");
         }
 
         return bindingResult.hasErrors();
