@@ -19,43 +19,36 @@
                     <fieldset>
                         <legend>Uuden saunojan tiedot</legend>
 
-                        <div th:if="${#fields.hasErrors('firstName')}" class="alert alert-error">    
+                        <hr/>
+                        <div th:if="${#fields.hasErrors('firstName')}" class="alert alert-error" style="color: red">    
                             Virheellinen etunimi.
                         </div>
-
-                        <div th:if="${#fields.hasErrors('lastName')}" class="alert alert-error">    
-                            Virheellinen sukunimi.
-                        </div>
-
-                        <div th:if="${#fields.hasErrors('username')}" class="alert alert-error" th:errors="*{username}"> 
-                            Käyttäjätunnusvirheviesti
-                        </div>
-
-                        <div th:if="${#fields.hasErrors('password')}" class="alert alert-error"> 
-                            Virheellinen salasana.
-                        </div>
-
-                        <div th:if="${#fields.hasErrors('confirmPassword')}" class="alert alert-error"> 
-                            Salasanat eivät täsmää.
-                        </div>
-
-                        <div th:if="${#fields.hasErrors('photo')}" class="alert alert-error"> 
-                            Kuva on liian suuri ladattavaksi (Enintään 5MB).
-                        </div>
-
-                        <hr/>
-
                         <input placeholder="Etunimi" class="form-control" type="text" id="firstName" name="firstName"/>
                         <br/>
+
+                        <div th:if="${#fields.hasErrors('lastName')}" class="alert alert-error" style="color: red">    
+                            Virheellinen sukunimi.
+                        </div>
                         <input placeholder="Sukunimi" class="form-control" type="text" id="lastName" name="lastName"/>
                         <br/>
+
+                        <div th:if="${#fields.hasErrors('username')}" class="alert alert-error" style="color: red" th:errors="*{username}"> 
+                            Löylytunnusvirheviesti
+                        </div>
                         <input placeholder="Löylytunnus" class="form-control" type="text" id="username" name="username"/>
                         <br/>
-                        <input autocomplete="new-password" placeholder="Salasana" class="form-control" type="password" id="password" name="password"/>
+
+                        <div th:if="${#fields.hasErrors('password')}" class="alert alert-error" style="color: red"> 
+                            Virheellinen salasana.
+                        </div>
+                        <input autocomplete="new-password" placeholder="Salasana (vähintään 6 merkkiä pitkä, 1 iso kirjain, 1 erikoismerkki)" class="form-control" type="password" id="password" name="password"/>
                         <br/>
+
+                        <div th:if="${#fields.hasErrors('confirmPassword')}" class="alert alert-error" style="color: red"> 
+                            Salasanat eivät täsmää.
+                        </div>
                         <input placeholder="Salasana uudestaan" class="form-control" type="password" id="confirmPassword" name="confirmPassword"/>
                         <br/>
-                        <p class="w3-center">Salasanan oltava: vähintään 6 merkkiä pitkä, 1 iso kirjain, 1 erikoismerkki.</p>
 
                         <hr/>
 
@@ -64,6 +57,11 @@
                         <br/>
 
                         <div>
+
+                            <div th:if="${#fields.hasErrors('photo')}" class="alert alert-error" style="color: red"> 
+                                Kuva on liian suuri ladattavaksi (Enintään 5MB).
+                            </div>
+
                             <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('file').click()" style="white-space: nowrap"><i class="fa fa-file-image-o w3-left"></i>&nbsp; Valitse profiilikuva </button>
 
                             <button type="submit" class="w3-button w3-theme-d1 w3-margin-bottom w3-right"><i class="fa fa-plus"></i> Luo saunoja!</button>

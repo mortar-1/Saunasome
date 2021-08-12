@@ -34,7 +34,8 @@
                     
                     <hr class="w3-clear"/>
 
-                    <p th:text="${notification.content}" style="color: #FF0000">Viestin sisältö</p>
+                    <p th:if="${notification.isAlert}" th:text="${notification.content}" style="color: red">Viestin sisältö</p>
+                    <p th:unless="${notification.isAlert}" th:text="${notification.content}" style="color: greenyellow">Viestin sisältö</p>
 
                     <form method="POST" th:action="@{'/notifications/' + ${notification.Id} + '/delete'}">
                         <input type="hidden" name="usernameAuthor" th:value="${notification.recipient.username}"/>

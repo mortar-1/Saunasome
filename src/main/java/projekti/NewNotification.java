@@ -10,5 +10,7 @@ import lombok.NoArgsConstructor;
 public class NewNotification {
 
     private String content;
+    
+    private Boolean isAlert;
         
 }

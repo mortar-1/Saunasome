@@ -25,5 +25,7 @@ public class Notification extends AbstractPersistable<Long> {
     private LocalDateTime created;
 
     private LocalDateTime expires;
+    
+    private Boolean isAlert;
 
 }

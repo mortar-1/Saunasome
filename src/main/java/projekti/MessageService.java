@@ -87,15 +87,17 @@ public class MessageService {
         return bindingResult.hasErrors();
     }
 
-    public void newPhotoMessage(Long photoId) {
+    public void newPhotoMessage(Photo photo) {
 
         Message message = newEmptyMessage();
+        
+        message.setAuthor(photo.getAuthor());
 
         message.setIsNewPhotoMessage(Boolean.TRUE);
 
         message.setContent("lisäsi uuden kuvan.");
 
-        message.setPhotoId(photoId);
+        message.setPhotoId(photo.getId());
 
         messageRepository.save(message);
     }

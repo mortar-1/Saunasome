@@ -73,13 +73,13 @@ public class PhotoService {
     }
 
     @PreAuthorize("hasAuthority('USER') and !hasAuthority('FROZEN')")
-    public void addNewPhoto(Saunoja author, byte[] content, String description, boolean isProfilepicture, boolean isDefaultphoto) throws IOException {
+    public void addNewPhoto(Saunoja author, byte[] content, String description, boolean isProfilepicture, boolean isFirstPhoto) throws IOException {
 
         if (photoRepository.findByAuthor(author).size() < 10) {
 
-            Photo newPhoto = createNewPhoto(author, content);
+            Photo photo = createNewPhoto(author, content);
 
-            newPhoto.setDescription(description);
+            photo.setDescription(description);
 
             if (isProfilepicture && !photoRepository.findByAuthor(author).isEmpty()) {
 
@@ -89,18 +89,18 @@ public class PhotoService {
                 }
             }
 
-            newPhoto.setIsProfilePicture(isProfilepicture);
+            photo.setIsProfilePicture(isProfilepicture);
 
-            photoRepository.save(newPhoto);
+            photoRepository.save(photo);
 
-            if (saunojaService.getCurrentAuthentication() != null && !isDefaultphoto) {
+            if (saunojaService.getCurrentAuthentication() != null && !isFirstPhoto) {
 
-                messageService.newPhotoMessage(newPhoto.getId());
+                messageService.newPhotoMessage(photo);
             }
 
             if (isProfilepicture) {
 
-                saunojaService.setProfilepictureId(author, newPhoto.getId());
+                saunojaService.setProfilepictureId(author, photo.getId());
             }
         }
     }
@@ -134,7 +134,7 @@ public class PhotoService {
             addDefaultPhoto(author);
         } else {
 
-            addNewPhoto(author, photo.getBytes(), "", true, false);
+            addNewPhoto(author, photo.getBytes(), "", true, true);
         }
     }
 

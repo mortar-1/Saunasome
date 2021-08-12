@@ -14,7 +14,7 @@
         <div th:replace="fragments/layout :: sidebar"></div>
 
         <div class="container" style="margin-top:30px" th:unless="${authorBlockedUsernames.contains(currentSaunoja.username)}" >
-            
+
             <div th:if="${currentSaunoja.roles.contains('FROZEN')}">
                 <h3 th:unless="${accountFreeze.expires == null}" style="color: #FF0000" th:text="${accountFreeze.author.username + ' on laittanut sinut avantoon huonon käytöksen vuoksi. Olet avannossa ' + #temporals.format(accountFreeze.expires, 'd.M.yy HH:mm') + ' saakka.'}"  ></h3>
                 <h3 th:if="${accountFreeze.expires == null}" style="color: #FF0000" th:text="${accountFreeze.author.username + ' on laittanut sinut avantoon huonon käytöksen vuoksi. Olet vaipunut horrokseen ikusiksi ajoiksi tai kunnes saunan henget päättävät ottaa sinut takaisin saunaan virkoamaan.'}"  ></h3>
@@ -33,11 +33,11 @@
 
                 <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
 
-                    <button th:unless="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addAdmin').click()"><i class="fa fa-thumbs-up"></i> tee ADMIN </button>
-                    <button th:if="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeAdmin').click()"><i class="fa fa-thumbs-up"></i> peru ADMIN </button>
+                    <button th:unless="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addAdmin').click()"> tee ADMIN </button>
+                    <button th:if="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeAdmin').click()"> peru ADMIN </button>
 
-                    <button th:unless="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('addGod').click()"><i class="fa fa-thumbs-up"></i> tee GOD </button>
-                    <button th:if="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('removeGod').click()"><i class="fa fa-thumbs-up"></i> peru GOD </button>
+                    <button th:unless="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('addGod').click()"> tee GOD </button>
+                    <button th:if="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('removeGod').click()"> peru GOD </button>
 
                     <br/>
                     <br/>
@@ -81,8 +81,8 @@
                         <input type="submit" style="display:none" id="addFrozen"/>
                     </form>
 
-                    <button th:unless="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addFrozen').click()"><i class="fa fa-microphone-slash"></i> Jäädytä tili </button>
-                    <button th:if="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeFrozen').click()"><i class="fa fa-microphone"></i> Avaa tili </button>
+                    <button th:unless="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addFrozen').click()"><i class="fa fa-microphone-slash"></i> Heitä avantoon </button>
+                    <button th:if="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeFrozen').click()"><i class="fa fa-microphone"></i> Hae avannosta </button>
 
                     <br/>
                     <br/>
@@ -150,9 +150,9 @@
                 </div>
 
             </div>
-            
+
             <!-- PRIVATE MESSAGE FROM ADMIN -->
-            
+
             <div sec:authorize="hasAuthority('ADMIN')" th:unless="${saunoja.username.equals(currentSaunoja.username)}" class="w3-container w3-card w3-white w3-round w3-section">
 
                 <br/>
@@ -167,24 +167,29 @@
                     <textarea th:placeholder="${'Lähetä ' + saunoja.username + ':lle yksityisilmoitus (enintään 200 merkkiä pitkä)'}" class="textarea" onkeyup="countChar(this)" name="content" form="newNotificationForm"></textarea>
                     <div id="charNum"></div>
 
+                    <p><input type="radio" name="isAlert" value="false" checked="checked"/> &nbsp; neutraali </p>
+                    <p><input type="radio" name="isAlert" value="true"/> &nbsp; vihainen </p>
+                    
                     <br/>
                     <hr class="w3-clear"/>
 
                     <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewNotification').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
                     <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendTakeItEasyNotification').click()">"Korjaa käytöstäsi..." <i class="fa fa-arrow-circle-right"></i></button>
-                    
+
                     <input type="submit" style="display: none" th:id="sendNewNotification"/>
                 </form>
-                
+
                 <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}">
 
                     <input type="hidden" name="content" value="Korjaa käytöstäsi, tai sinut laitetaan avantoon!"/>
-                                                           
+
+                    <input type="hidden" name="isAlert" value="=true"/>
+
                     <input type="submit" style="display: none" th:id="sendTakeItEasyNotification"/>
                 </form>
 
             </div>
-            
+
 
             <!-- PHOTOS -->
 

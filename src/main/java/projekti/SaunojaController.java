@@ -69,7 +69,7 @@ public class SaunojaController {
 
         saunojaService.createNewAccount(newSaunoja.getUsername(), newSaunoja.getPassword(), newSaunoja.getFirstName(), newSaunoja.getLastName(), newSaunoja.getPhoto());
 
-        return "redirect:/main";
+        return "redirect:/main?created=true";
     }
 
     @GetMapping("/saunojat/{username}")

@@ -32,6 +32,9 @@ public class SaunojaService {
     private BlockRepository blockRepository;
 
     @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public Saunoja getByUsername(String username) {
@@ -129,7 +132,7 @@ public class SaunojaService {
             bindingResult.rejectValue("confirmPassword", "error.newSaunoja", "Salasanat eivät täsmää.");
         }
 
-        if (saunojaRepository.findByUsername(newSaunoja.getUsername()) != null) {
+        if (saunojaRepository.findByUsernameIgnoreCase(newSaunoja.getUsername()) != null) {
 
             bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus on varattu.");
         }
@@ -138,7 +141,7 @@ public class SaunojaService {
 
             bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus ei saa sisältää välilyöntejä.");
         }
-                
+
         if (newSaunoja.getUsername().length() < 2 || newSaunoja.getUsername().length() > 20 || newSaunoja.getUsername().isBlank()) {
 
             bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnuksen pituden tulee olla välillä 2 - 20 merkkiä.");
@@ -266,7 +269,7 @@ public class SaunojaService {
         if (!isNotFollowing(subject, object)) {
 
             model.addAttribute("isfollowing", "true");
-            
+
             model.addAttribute("followCreated", followingFromWhen(subject, object));
         }
 
@@ -278,13 +281,13 @@ public class SaunojaService {
         if (!haveNotBlocked(subject, object)) {
 
             model.addAttribute("isBlocking", "true");
-            
+
             model.addAttribute("blockCreated", blockingFromWhen(subject, object));
         }
 
         if (haveNotBlocked(subject, object)) {
 
-            model.addAttribute("isBlocking", "false");           
+            model.addAttribute("isBlocking", "false");
         }
     }
 
@@ -341,6 +344,8 @@ public class SaunojaService {
             if (!saunoja.getRoles().contains("ADMIN")) {
 
                 saunoja.getRoles().add("ADMIN");
+
+                notificationService.newNotification(username, new NewNotification("Sinulla on nyt ADMIN tason käyttöoikeudet.", Boolean.FALSE));
             }
         }
 
@@ -349,6 +354,8 @@ public class SaunojaService {
             if (saunoja.getRoles().contains("ADMIN")) {
 
                 saunoja.getRoles().remove("ADMIN");
+
+                notificationService.newNotification(username, new NewNotification("Sinulta poistettiin ADMIN tason käyttöoikeudet.", Boolean.TRUE));
             }
         }
 
@@ -357,6 +364,8 @@ public class SaunojaService {
             if (!saunoja.getRoles().contains("GOD")) {
 
                 saunoja.getRoles().add("GOD");
+
+                notificationService.newNotification(username, new NewNotification("Sinulla on nyt GOD tason käyttöoikeudet.", Boolean.FALSE));
             }
         }
 
@@ -365,34 +374,50 @@ public class SaunojaService {
             if (saunoja.getRoles().contains("GOD")) {
 
                 saunoja.getRoles().remove("GOD");
+
+                notificationService.newNotification(username, new NewNotification("Sinulta poistettiin GOD tason käyttöoikeudet.", Boolean.TRUE));
             }
         }
 
         if (action.equals("addFrozen")) {
 
             if (!saunoja.getRoles().contains("FROZEN")) {
+                
+                if (saunoja.getRoles().contains("ADMIN")) {
+
+                    saunoja.getRoles().remove("ADMIN");
+                }
+                
+                if (saunoja.getRoles().contains("GOD")) {
+
+                    saunoja.getRoles().remove("GOD");
+                }
 
                 saunoja.getRoles().add("FROZEN");
+
+                notificationService.newNotification(username, new NewNotification("Sinut laitettiin avantoon.", Boolean.TRUE));
             }
         }
 
         if (action.equals("removeFrozen")) {
 
             if (saunoja.getRoles().contains("FROZEN")) {
-
+                
                 saunoja.getRoles().remove("FROZEN");
+
+                notificationService.newNotification(username, new NewNotification("Sinut otettiin takaisin avannosta.", Boolean.FALSE));
             }
         }
 
         saunojaRepository.save(saunoja);
     }
-    
+
     public void removeFreezeFromRoles(String username) {
-        
+
         Saunoja saunoja = getByUsername(username);
-        
+
         saunoja.getRoles().remove("FROZEN");
-        
+
         saunojaRepository.save(saunoja);
     }
 
