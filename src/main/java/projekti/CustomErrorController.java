@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
-@Profile("prod")
+@Profile("production")
 public class CustomErrorController implements ErrorController {
     
     @RequestMapping("/error")
