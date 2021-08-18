@@ -30,7 +30,7 @@
                     <hr class="w3-clear"/>
 
                     <!--ROLE CONTROL-->
-                    
+
                     <br/>
 
                     <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
@@ -71,13 +71,18 @@
                     </div>
 
                     <!--ACCOUNT FREEZING AND DELETING-->
-                    
+
                     <br/>
 
                     <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
 
-                        <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/freeze'}" method="POST">
+                        <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/freeze'}" method="POST" th:object="${newAccountFreeze}">
+                            <div th:if="${#fields.hasErrors('timeToExpiration')}" th:errors="*{timeToExpiration}" class="alert alert-error">    
+                                Viestin virheviesti.
+                            </div>
                             <input type="text" name="timeToExpiration" placeholder="kuinka monta..."/>
+                            <br/>
+                            <br/>
                             <p><input type="radio" name="timeUnit" value="min"/> &nbsp; minuuttia </p>
                             <p><input type="radio" name="timeUnit" value="h"/> &nbsp; tuntia </p>
                             <p><input type="radio" name="timeUnit" value="d"/> &nbsp; päivää </p>
@@ -101,7 +106,7 @@
                             <input type="submit" style="display:none" id="removeFrozen"/>
                         </form>
                     </div>
-                    
+
                     <div>
                         <form sec:authorize="hasAuthority('GOD')" th:action="@{'/saunojat/' + ${saunoja.username} + '/delete'}" method="POST">
                             <input type="submit" style="display:none" id="deleteSaunoja"/>
@@ -117,7 +122,7 @@
                     <hr class="w3-clear"/>
 
                     <!--FOLLOW CONTROL-->
-                    
+
                     <br/>
 
                     <div th:if="${!saunoja.username.equals(currentSaunoja.username)}">
@@ -125,8 +130,8 @@
                         <button th:unless="${isfollowing}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
                         <button th:if="${isfollowing}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> <span th:text="${'Lakkaa kuuntelemasta (kuunnellut ' + #temporals.format(followCreated, 'd.M.yy') + ' ->)'}"/> </button>
 
-                        <button th:unless="${isBlocking}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i> Estä</button>
-                        <button th:if="${isBlocking}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i> <span th:text="${'Lopeta esto (estänyt ' + #temporals.format(blockCreated, 'd.M.yy') + ' ->)'}"/></button>
+                        <button th:unless="${isBlocking or saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i> Estä</button>
+                        <button th:if="${isBlocking and !saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i> <span th:text="${'Lopeta esto (estänyt ' + #temporals.format(blockCreated, 'd.M.yy') + ' ->)'}"/></button>
 
                         <br/>
                         <br/>
@@ -148,14 +153,14 @@
                         </form>
                     </div>
 
-                    <div th:unless="${isBlocking}">
+                    <div th:unless="${isBlocking or saunoja.roles.contains('ADMIN')}">
                         <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
                             <input type="hidden" name="action" value="block"/>
                             <input type="submit" style="display:none" id="block"/>
                         </form>
                     </div>
 
-                    <div th:if="${isBlocking}">
+                    <div th:if="${isBlocking and !saunoja.roles.contains('ADMIN')}">
                         <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
                             <input type="hidden" name="action" value="unblock"/>
                             <input type="submit" style="display:none" id="unblock"/>

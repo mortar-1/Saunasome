@@ -251,7 +251,8 @@ public class SaunojaService {
             followRespository.deleteByFollowerAndFollowed(follower, followed);
         }
     }
-
+    
+    @PreAuthorize("!#blocked.roles.contains('ADMIN')")
     public void block(Saunoja blocker, Saunoja blocked) {
 
         if (haveNotBlocked(blocker, blocked)) {

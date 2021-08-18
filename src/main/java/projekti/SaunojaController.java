@@ -75,7 +75,7 @@ public class SaunojaController {
     }
 
     @GetMapping("/saunojat/{username}")
-    public String viewSaunoja(Model model, @PathVariable String username, @ModelAttribute NewPhoto newPhoto, @ModelAttribute NewNotification newNotification) {
+    public String viewSaunoja(Model model, @PathVariable String username, @ModelAttribute NewPhoto newPhoto, @ModelAttribute NewNotification newNotification, @ModelAttribute NewAccountFreeze newAccountFreeze) {
 
         if (saunojaRepository.findByUsername(username) == null) {
 

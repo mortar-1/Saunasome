@@ -1,11 +1,13 @@
 package projekti;
 
 import java.time.LocalDateTime;
+import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 @Service
 class AccountFreezeService {
@@ -17,8 +19,17 @@ class AccountFreezeService {
     private SaunojaService saunojaService;
 
     @PreAuthorize("hasAuthority('GOD')")
-    public void freezeAccount(String username, Integer timeToExpiration, String timeUnit) {
-
+    public void freezeAccount(String username, NewAccountFreeze newAccountFreeze) {
+        
+        if (Pattern.matches("[1-9]+", newAccountFreeze.getTimeToExpiration())) {
+            
+            return;
+        }
+        
+        Integer timeToExpiration = Integer.valueOf(newAccountFreeze.getTimeToExpiration());
+        
+        String timeUnit = newAccountFreeze.getTimeUnit();
+                
         AccountFreeze accountFreeze = new AccountFreeze();
 
         accountFreeze.setAuthor(saunojaService.getCurrentSaunoja());
@@ -54,13 +65,28 @@ class AccountFreezeService {
 
         accountFreezeRepository.save(accountFreeze);
     }
-    
+
+    public Boolean hasErrorsOnCreation(NewAccountFreeze newAccountFreeze, BindingResult bindingResult) {
+
+        if (newAccountFreeze.getTimeToExpiration().isBlank() && !newAccountFreeze.getTimeUnit().equalsIgnoreCase("forever")) {
+
+            bindingResult.rejectValue("timeToExpiration", "error.newAccountFreeze", "Täsmennä luvulla avannossaolo aika.");
+        }
+        
+        if (!Pattern.matches("[0-9]+", newAccountFreeze.getTimeToExpiration())) {
+            
+            bindingResult.rejectValue("timeToExpiration", "error.newAccountFreeze", "Syötä vain numeroita.");
+        }
+
+        return bindingResult.hasErrors();
+    }
+
     @Transactional
     public void unFreezeAccount(String username) {
 
         accountFreezeRepository.deleteByRecipient(saunojaService.getByUsername(username));
 
-        saunojaService.removeFreezeFromRoles(username);     
+        saunojaService.removeFreezeFromRoles(username);
     }
 
     public void checkIfFrozen(Model model) {
