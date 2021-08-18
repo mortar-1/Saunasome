@@ -82,7 +82,7 @@ public class PhotoService {
     public void addNewPhoto(Saunoja author, byte[] content, String description, boolean isProfilepicture, boolean isFirstPhoto) throws IOException {
 
         if (!hasTenPictures(author)) {
-
+            
             Photo photo = createNewPhoto(author, content);
 
             photo.setDescription(description);
@@ -96,9 +96,9 @@ public class PhotoService {
             }
 
             photo.setIsProfilePicture(isProfilepicture);
-
+            
             photoRepository.save(photo);
-
+           
             if (saunojaService.getCurrentAuthentication() != null && !isFirstPhoto) {
 
                 messageService.newPhotoMessage(photo);
@@ -141,7 +141,7 @@ public class PhotoService {
     public void addFirstPhoto(MultipartFile photo, Saunoja author) throws IOException {
 
         if (photo.isEmpty()) {
-
+                        
             addDefaultPhoto(author);
         } else {
 
@@ -150,7 +150,7 @@ public class PhotoService {
     }
 
     public void addDefaultPhoto(Saunoja author) throws IOException {
-
+        
         File defaultPhoto = new File("photos/defaultPicture.png");
 
         BufferedImage image = ImageIO.read(defaultPhoto);
@@ -158,7 +158,7 @@ public class PhotoService {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         ImageIO.write(image, "jpg", bos);
-
+        
         addNewPhoto(author, bos.toByteArray(), "", true, true);
     }
 
@@ -240,13 +240,13 @@ public class PhotoService {
     }
 
     public Photo createNewPhoto(Saunoja author, byte[] content) {
-
+        
         Photo newPhoto = new Photo();
 
         newPhoto.setContent(content);
-
+        
         newPhoto.setAuthor(author);
-
+        
         newPhoto.setDescription("");
 
         newPhoto.setLikes(new ArrayList<>());

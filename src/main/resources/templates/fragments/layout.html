@@ -63,16 +63,16 @@
                 <div class="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul class="navbar-nav">
                         <li sec:authorize="hasAuthority('USER')" class="nav-item">
-                            <a class="nav-link" th:href="@{/wall}">Lauteet</a>
+                            <a class="nav-link" th:href="@{/wall}" style="font-family: 'Harrington'; color: white; font-size: 20px">Lauteet</a>
                         </li>
                         <li sec:authorize="hasAuthority('USER')" class="nav-item">
-                            <a class="nav-link" th:href="@{/saunojat}">Etsi saunoja</a>
+                            <a class="nav-link" th:href="@{/saunojat}" style="font-family: 'Harrington'; color: white; font-size: 20px">Etsi saunoja</a>
                         </li>
                         <li sec:authorize="hasAuthority('USER')" class="nav-item">
-                            <a class="nav-link" th:href="@{'/saunojat/' + ${#authentication.name}}">Oma profiili</a>
+                            <a class="nav-link" th:href="@{'/saunojat/' + ${#authentication.name}}" style="font-family: 'Harrington'; color: white; font-size: 20px">Oma profiili</a>
                         </li>
                         <li sec:authorize="hasAuthority('ADMIN')" class="nav-item">
-                            <a class="nav-link" th:href="@{/notifications}">Yksityisilmoitukset</a>
+                            <a class="nav-link" th:href="@{/notifications}" style="font-family: 'Harrington'; color: white; font-size: 20px">Yksityisilmoitukset</a>
                         </li>
                     </ul>
                 </div>  
@@ -88,7 +88,7 @@
                         <img th:src="@{'/photo/' + ${currentSaunoja.profilepictureId}}" alt="Avatar" class="w3-circle" style="width:40px; height:40px" onclick="openOrCloseSidebar()" />
                     </div>
                     <div class="col-11">
-                        <h5 th:text="${currentSaunoja.username}">Saunojan käyttäjätunnus</h5>
+                        <h5 th:text="${currentSaunoja.username}" style="font-family: 'Harrington'; color: green; font-size: 20px">Saunojan käyttäjätunnus</h5>
                     </div>
                 </div>
 

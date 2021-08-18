@@ -23,10 +23,9 @@
 
                 <!-- USERNAME AND PROFILEPICTURE -->
 
-                <a th:href="@{'/saunojat/' + ${photo.author.username}}"><img th:src="@{'/photo/' + ${photo.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:60px; height:60px"/></a>            
-                <p th:text="${photo.author.username}"></p>
+                <a th:href="@{'/saunojat/' + ${photo.author.username}}"><img th:src="@{'/photo/' + ${photo.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>            
+                <h4 th:text="${photo.author.username}" style="font-family: 'Harrington'; color: green; font-size: 22px">Löylytunnus</h4>
 
-                <br/>
                 <hr class="w3-clear"/>
 
                 <!-- NEXT AND/OR PREVIOUS -->
@@ -92,14 +91,14 @@
             <!-- LIKES -->
 
 
-            <h5 th:unless="${photo.likes.isEmpty()}">Vihtoneet: </h5>
+            <h5 th:unless="${photo.likes.isEmpty()}" Style="font-family: 'Harrington'; font-size: 22px">Vihtoneet: </h5>
             <ol>
                 <li th:each="likerUsername : ${photo.likes}">
-                    <a th:href="@{'/saunojat/' + ${likerUsername}}" th:text="${likerUsername}">Tykkäävä saunoja</a>
+                    <a th:href="@{'/saunojat/' + ${likerUsername}}" th:text="${likerUsername}" Style="font-family: 'Harrington'; color: green; font-size: 18px">Tykkäävä saunoja</a>
                 </li>
             </ol>
 
-            <!-- COMMENT -->
+            <!-- NEW COMMENT -->
 
             <div>
                 <div th:unless="${currentSaunoja.roles.contains('FROZEN')}" class="w3-container w3-card w3-white w3-round w3-margin">
@@ -132,12 +131,11 @@
             <div th:each="comment : ${comments}">
                 <div class="w3-container w3-card w3-white w3-round w3-margin">
                     <br/>
-                    <a th:href="@{'/saunojat/' + ${comment.author.username}}"><img th:src="@{'/photo/' + ${comment.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:60px; height:60px"/></a>
+                    <a th:href="@{'/saunojat/' + ${comment.author.username}}"><img th:src="@{'/photo/' + ${comment.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
                     <span class="w3-right w3-opacity" th:unless="${comment.created.toLocalDate().equals(#temporals.createToday())}" th:text="${#temporals.format(comment.created, 'd.M.yy HH:mm')}">Kommentin ajankohta</span>
                     <span class="w3-right w3-opacity" th:if="${comment.created.toLocalDate().equals(#temporals.createToday())}" th:text="${' tänään ' + #temporals.format(comment.created, 'HH:mm')}">Kommentin ajankohta</span>
-                    <h4 th:text="${comment.author.username}">Löylytunnus</h4>
+                    <h4 th:text="${comment.author.username}" Style="font-family: 'Harrington'; color: green; font-size: 22px">Löylytunnus</h4>
 
-                    <br/>
                     <hr class="w3-clear"/>
 
                     <p th:text="${comment.content}">Kommentin sisältö</p>
@@ -145,9 +143,9 @@
                     <br/>
                     <hr class="w3-clear"/>
 
-                    <button th:unless="${comment.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('like' + ${comment.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
-                    <button th:if="${comment.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('unlike' + ${comment.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
-                    <button th:if="${comment.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d2 w3-margin-bottom" th:attr="onclick=|document.getElementById('delete' + ${comment.id}).click()|"><i class="fa fa-close"></i> Poista Kommentti</button>  
+                    <button th:unless="${comment.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('like' + ${comment.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
+                    <button th:if="${comment.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('unlike' + ${comment.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
+                    <button th:if="${comment.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${comment.id}).click()|"><i class="fa fa-close"></i> Poista Kommentti</button>  
 
                     <form method="POST" th:action="@{'/comment/' + ${comment.Id} + '/delete'}">
                         <input type="hidden" name="usernameAuthor" th:value="${comment.author.username}"/>

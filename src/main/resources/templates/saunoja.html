@@ -20,186 +20,200 @@
                 <h3 th:if="${accountFreeze.expires == null}" style="color: #FF0000" th:text="${accountFreeze.author.username + ' on laittanut sinut avantoon huonon käytöksen vuoksi. Olet vaipunut horrokseen ikusiksi ajoiksi tai kunnes saunan henget päättävät ottaa sinut takaisin saunaan virkoamaan.'}"  ></h3>
             </div>
 
-            <div class="w3-container w3-card w3-white w3-round w3-section">
+            <div class="card">
+                <div class="card-body">
 
-                <!-- USERNAME AND NAME -->
+                    <!-- USERNAME AND NAME -->
 
-                <h1 th:text="${saunoja.username}" style="font-family: 'Harrington'; color: green" class="w3-center">Nimimerkki</h1>
-                <h3 th:text="${saunoja.firstName + ' ' + saunoja.lastName}" style="font-family: 'Harrington'; color: green" class="w3-center">Nimi</h3>
-
-                <hr class="w3-clear"/>
-
-                <!--ROLE CONTROL-->
-
-                <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
-
-                    <button th:unless="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addAdmin').click()"> tee ADMIN </button>
-                    <button th:if="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeAdmin').click()"> peru ADMIN </button>
-
-                    <button th:unless="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('addGod').click()"> tee GOD </button>
-                    <button th:if="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('removeGod').click()"> peru GOD </button>
-
-                    <br/>
-                    <br/>
-
+                    <h1 th:text="${saunoja.username}" class="card-title text-center" style="font-family: 'Harrington'; color: green">Nimimerkki</h1>
+                    <h3 th:text="${saunoja.firstName + ' ' + saunoja.lastName}" class="card-title text-center" style="font-family: 'Harrington'; color: green">Nimi</h3>
                     <hr class="w3-clear"/>
 
-                </div>
-
-                <div>
-                    <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('ADMIN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
-                        <input type="hidden" name="action" th:value="addAdmin"/>
-                        <input type="submit" style="display:none" id="addAdmin"/>
-                    </form>
-
-                    <form sec:authorize="hasAuthority('GOD')" th:if="${saunoja.roles.contains('ADMIN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
-                        <input type="hidden" name="action" th:value="removeAdmin"/>
-                        <input type="submit" style="display:none" id="removeAdmin"/>
-                    </form>
-
-                    <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('GOD')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
-                        <input type="hidden" name="action" th:value="addGod"/>
-                        <input type="submit" style="display:none" id="addGod"/>
-                    </form>
-
-                    <form sec:authorize="hasAuthority('GOD')" th:if="${saunoja.roles.contains('GOD')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
-                        <input type="hidden" name="action" th:value="removeGod"/>
-                        <input type="submit" style="display:none" id="removeGod"/>
-                    </form>
-                </div>
-
-                <!--ACCOUNT FREEZING-->
-
-                <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
-
-                    <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/freeze'}" method="POST">
-                        <input type="text" name="timeToExpiration" placeholder="kuinka monta..."/>
-                        <p><input type="radio" name="timeUnit" value="min"/> &nbsp; minuuttia </p>
-                        <p><input type="radio" name="timeUnit" value="h"/> &nbsp; tuntia </p>
-                        <p><input type="radio" name="timeUnit" value="d"/> &nbsp; päivää </p>
-                        <p><input type="radio" name="timeUnit" value="forever" checked="checked"/> &nbsp; toistaiseksi </p>
-                        <input type="submit" style="display:none" id="addFrozen"/>
-                    </form>
-
-                    <button th:unless="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addFrozen').click()"><i class="fa fa-microphone-slash"></i> Heitä avantoon </button>
-                    <button th:if="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeFrozen').click()"><i class="fa fa-microphone"></i> Hae avannosta </button>
-
-                    <br/>
+                    <!--ROLE CONTROL-->
+                    
                     <br/>
 
-                    <hr class="w3-clear"/>
+                    <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
 
-                </div>
+                        <button th:unless="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addAdmin').click()"> tee ADMIN </button>
+                        <button th:if="${saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeAdmin').click()"> peru ADMIN </button>
 
-                <div>
-                    <form sec:authorize="hasAuthority('GOD')" th:if="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/unfreeze'}" method="POST">
-                        <input type="submit" style="display:none" id="removeFrozen"/>
-                    </form>
-                </div>
+                        <button th:unless="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('addGod').click()"> tee GOD </button>
+                        <button th:if="${saunoja.roles.contains('GOD')}" type="button" class="w3-button w3-theme-d1 w3-right" onclick="document.getElementById('removeGod').click()"> peru GOD </button>
 
+                        <br/>
+                        <br/>
 
-                <!-- PROFILE PICTURE -->
+                        <hr class="w3-clear"/>
 
-                <a th:href="@{'/photo/' + ${profilePicture.Id} + '/view'}"><img class="center" th:src="@{'/photo/' + ${profilePicture.Id} }" height="200"/></a>
+                    </div>
 
-                <br/>
-                <hr class="w3-clear"/>
+                    <div>
+                        <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('ADMIN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
+                            <input type="hidden" name="action" th:value="addAdmin"/>
+                            <input type="submit" style="display:none" id="addAdmin"/>
+                        </form>
 
-                <!--FOLLOW CONTROL-->
+                        <form sec:authorize="hasAuthority('GOD')" th:if="${saunoja.roles.contains('ADMIN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
+                            <input type="hidden" name="action" th:value="removeAdmin"/>
+                            <input type="submit" style="display:none" id="removeAdmin"/>
+                        </form>
 
-                <div th:if="${!saunoja.username.equals(currentSaunoja.username)}">
+                        <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('GOD')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
+                            <input type="hidden" name="action" th:value="addGod"/>
+                            <input type="submit" style="display:none" id="addGod"/>
+                        </form>
 
-                    <button th:unless="${isfollowing}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
-                    <button th:if="${isfollowing}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> <span th:text="${'Lakkaa kuuntelemasta (kuunnellut ' + #temporals.format(followCreated, 'd.M.yy') + ' ->)'}"/> </button>
+                        <form sec:authorize="hasAuthority('GOD')" th:if="${saunoja.roles.contains('GOD')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/authorize'}" method="POST">
+                            <input type="hidden" name="action" th:value="removeGod"/>
+                            <input type="submit" style="display:none" id="removeGod"/>
+                        </form>
+                    </div>
 
-                    <button th:unless="${isBlocking}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i> Estä</button>
-                    <button th:if="${isBlocking}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i> <span th:text="${'Lopeta esto (estänyt ' + #temporals.format(blockCreated, 'd.M.yy') + ' ->)'}"/></button>
-
+                    <!--ACCOUNT FREEZING AND DELETING-->
+                    
                     <br/>
+
+                    <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
+
+                        <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/freeze'}" method="POST">
+                            <input type="text" name="timeToExpiration" placeholder="kuinka monta..."/>
+                            <p><input type="radio" name="timeUnit" value="min"/> &nbsp; minuuttia </p>
+                            <p><input type="radio" name="timeUnit" value="h"/> &nbsp; tuntia </p>
+                            <p><input type="radio" name="timeUnit" value="d"/> &nbsp; päivää </p>
+                            <p><input type="radio" name="timeUnit" value="forever" checked="checked"/> &nbsp; toistaiseksi </p>
+                            <input type="submit" style="display:none" id="addFrozen"/>
+                        </form>
+
+                        <button th:unless="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('addFrozen').click()"><i class="fa fa-microphone-slash"></i> Heitä avantoon </button>
+                        <button th:if="${saunoja.roles.contains('FROZEN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('removeFrozen').click()"><i class="fa fa-microphone"></i> Hae avannosta </button>
+                        <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-right" onclick="document.getElementById('deleteSaunoja').click()"><i class="fa fa-user-times"></i> Poista saunoja </button>
+
+                        <br/>
+                        <br/>
+
+                        <hr class="w3-clear"/>
+
+                    </div>
+
+                    <div>
+                        <form sec:authorize="hasAuthority('GOD')" th:if="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/unfreeze'}" method="POST">
+                            <input type="submit" style="display:none" id="removeFrozen"/>
+                        </form>
+                    </div>
+                    
+                    <div>
+                        <form sec:authorize="hasAuthority('GOD')" th:action="@{'/saunojat/' + ${saunoja.username} + '/delete'}" method="POST">
+                            <input type="submit" style="display:none" id="deleteSaunoja"/>
+                        </form>
+                    </div>
+
+
+                    <!-- PROFILE PICTURE -->
+
+                    <a th:href="@{'/photo/' + ${profilePicture.Id} + '/view'}"><img class="center" th:src="@{'/photo/' + ${profilePicture.Id} }" height="200"/></a>
+
                     <br/>
                     <hr class="w3-clear"/>
 
-                </div>
-
-                <div th:unless="${isfollowing}">
-                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
-                        <input type="hidden" name="action" value="follow"/>
-                        <input type="submit" style="display:none" id="follow"/>
-                    </form>
-                </div>
-
-                <div th:if="${isfollowing}">
-                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
-                        <input type="hidden" name="action" value="unfollow"/>
-                        <input type="submit" style="display:none" id="unfollow"/>
-                    </form>
-                </div>
-
-                <div th:unless="${isBlocking}">
-                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
-                        <input type="hidden" name="action" value="block"/>
-                        <input type="submit" style="display:none" id="block"/>
-                    </form>
-                </div>
-
-                <div th:if="${isBlocking}">
-                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
-                        <input type="hidden" name="action" value="unblock"/>
-                        <input type="submit" style="display:none" id="unblock"/>
-                    </form>
-                </div>
-
-
-
-                <!-- PRIVATE MESSAGE FROM ADMIN -->
-
-                <div sec:authorize="hasAuthority('ADMIN')" th:unless="${saunoja.username.equals(currentSaunoja.username)}">
-
+                    <!--FOLLOW CONTROL-->
+                    
                     <br/>
 
-                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}" id="newNotificationForm" th:object="${newNotification}">
+                    <div th:if="${!saunoja.username.equals(currentSaunoja.username)}">
 
-                        <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="alert alert-error">    
-                            Viestin virheviesti.
-                            <hr/>
-                        </div>
+                        <button th:unless="${isfollowing}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
+                        <button th:if="${isfollowing}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> <span th:text="${'Lakkaa kuuntelemasta (kuunnellut ' + #temporals.format(followCreated, 'd.M.yy') + ' ->)'}"/> </button>
 
-                        <textarea th:placeholder="${'Lähetä ' + saunoja.username + ':lle yksityisilmoitus (enintään 200 merkkiä pitkä)'}" class="textarea" onkeyup="countChar(this)" name="content" form="newNotificationForm"></textarea>
-                        <div id="charNum"></div>
+                        <button th:unless="${isBlocking}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i> Estä</button>
+                        <button th:if="${isBlocking}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i> <span th:text="${'Lopeta esto (estänyt ' + #temporals.format(blockCreated, 'd.M.yy') + ' ->)'}"/></button>
 
-                        <p><input type="radio" name="isAlert" value="false" checked="checked"/> &nbsp; neutraali </p>
-                        <p><input type="radio" name="isAlert" value="true"/> &nbsp; vihainen </p>
+                        <br/>
+                        <br/>
+                        <hr class="w3-clear"/>
+
+                    </div>
+
+                    <div th:unless="${isfollowing}">
+                        <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
+                            <input type="hidden" name="action" value="follow"/>
+                            <input type="submit" style="display:none" id="follow"/>
+                        </form>
+                    </div>
+
+                    <div th:if="${isfollowing}">
+                        <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
+                            <input type="hidden" name="action" value="unfollow"/>
+                            <input type="submit" style="display:none" id="unfollow"/>
+                        </form>
+                    </div>
+
+                    <div th:unless="${isBlocking}">
+                        <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
+                            <input type="hidden" name="action" value="block"/>
+                            <input type="submit" style="display:none" id="block"/>
+                        </form>
+                    </div>
+
+                    <div th:if="${isBlocking}">
+                        <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/follow'}">
+                            <input type="hidden" name="action" value="unblock"/>
+                            <input type="submit" style="display:none" id="unblock"/>
+                        </form>
+                    </div>
+
+
+
+                    <!-- PRIVATE MESSAGE FROM ADMIN -->
+
+                    <div sec:authorize="hasAuthority('ADMIN')" th:unless="${saunoja.username.equals(currentSaunoja.username)}">
+
+                        <br/>
+
+                        <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}" id="newNotificationForm" th:object="${newNotification}">
+
+                            <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="alert alert-error">    
+                                Viestin virheviesti.
+                                <hr/>
+                            </div>
+
+                            <textarea th:placeholder="${'Lähetä ' + saunoja.username + ':lle yksityisilmoitus (enintään 200 merkkiä pitkä)'}" class="textarea" onkeyup="countChar(this)" name="content" form="newNotificationForm"></textarea>
+                            <div id="charNum"></div>
+
+                            <p><input type="radio" name="isAlert" value="false" checked="checked"/> &nbsp; neutraali </p>
+                            <p><input type="radio" name="isAlert" value="true"/> &nbsp; vihainen </p>
+
+                            <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('sendNewNotification').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
+                            <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-right" onclick="document.getElementById('sendTakeItEasyNotification').click()">"Korjaa käytöstäsi..." <i class="fa fa-arrow-circle-right"></i></button>
+
+                            <input type="submit" style="display: none" th:id="sendNewNotification"/>
+
+
+                        </form>
+
+                        <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}">
+
+                            <input type="hidden" name="content" value="Korjaa käytöstäsi, tai sinut laitetaan avantoon!"/>
+
+                            <input type="hidden" name="isAlert" value="=true"/>
+
+                            <input type="submit" style="display: none" th:id="sendTakeItEasyNotification"/>
+                        </form>
 
                         <br/>
                         <hr class="w3-clear"/>
 
-                        <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('sendNewNotification').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
-                        <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-right" onclick="document.getElementById('sendTakeItEasyNotification').click()">"Korjaa käytöstäsi..." <i class="fa fa-arrow-circle-right"></i></button>
-
-                        <input type="submit" style="display: none" th:id="sendNewNotification"/>
-                    </form>
-
-                    <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}">
-
-                        <input type="hidden" name="content" value="Korjaa käytöstäsi, tai sinut laitetaan avantoon!"/>
-
-                        <input type="hidden" name="isAlert" value="=true"/>
-
-                        <input type="submit" style="display: none" th:id="sendTakeItEasyNotification"/>
-                    </form>
-
-                </div>
-
-            </div>
+                    </div>
 
 
-            <!-- PHOTOS -->
 
-            <br/>
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title text-center" style="font-family: 'Harrington'; color: green">KUVA-ALBUMI</h2>
-                    <hr class="w3-clear"/>
+
+                    <!-- PHOTOS -->
+
+                    <br/>
+
+
+
                     <div class="row justify-content-center text-center" th:unless="${authorBlockedUsernames.contains(currentSaunoja.username) and !currentSaunoja.roles.contains('ADMIN')}">
                         <div class="col-4"  th:each="photo : ${photos}">
 

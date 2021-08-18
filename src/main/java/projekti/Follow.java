@@ -2,7 +2,9 @@ package projekti;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
@@ -16,10 +18,10 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Data
 public class Follow extends AbstractPersistable<Long>{
     
-    @OneToOne
+    @ManyToOne
     private Saunoja follower;
     
-    @OneToOne  
+    @ManyToOne
     private Saunoja followed;
     
     private LocalDateTime created;

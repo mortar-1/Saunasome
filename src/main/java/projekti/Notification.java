@@ -1,7 +1,9 @@
 package projekti;
 
 import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,10 +16,10 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Data
 public class Notification extends AbstractPersistable<Long> {
 
-    @OneToOne
+    @ManyToOne
     private Saunoja author;
 
-    @OneToOne
+    @ManyToOne
     private Saunoja recipient;
 
     private String content;

@@ -69,7 +69,7 @@ public class SaunojaController {
             return "register";
         }
 
-        saunojaService.createNewAccount(newSaunoja.getUsername(), newSaunoja.getPassword(), newSaunoja.getFirstName(), newSaunoja.getLastName(), newSaunoja.getPhoto());
+        saunojaService.createNewAccount(newSaunoja);
 
         return "redirect:/main?created=true";
     }
@@ -134,6 +134,14 @@ public class SaunojaController {
         String encodedUsername = URLEncoder.encode(username, "UTF-8");
 
         return "redirect:/saunojat/" + encodedUsername;
+    }
+    
+    @PostMapping("/saunojat/{username}/delete")
+    public String deleteSaunoja(@PathVariable String username) {
+        
+        saunojaService.deleteSaunoja(username);
+        
+        return "redirect:/wall";
     }
 
     @PostConstruct
