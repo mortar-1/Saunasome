@@ -495,5 +495,24 @@ public class SaunojaService {
             photoService.addDefaultPhoto(getByUsername("Ahti"));
         }
     }
+    
+    public void createGodForProduction() throws IOException {
+        
+        if (saunojaRepository.findAll().isEmpty()) {
+
+            List<String> roles = new ArrayList<>();
+
+            roles.add("USER");
+
+            roles.add("ADMIN");
+
+            roles.add("GOD");
+
+            saunojaRepository.save(new Saunoja("Väinämöinen", passwordEncoder.encode("!Sauna5"), "Ariel", "Mörtengren", roles, LocalDateTime.now(), 1L, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+
+            photoService.addDefaultPhoto(getByUsername("Ahti"));
+        }
+    }
+    
 
 }
