@@ -510,7 +510,7 @@ public class SaunojaService {
 
             saunojaRepository.save(new Saunoja("Väinämöinen", passwordEncoder.encode("!Sauna5"), "Ariel", "Mörtengren", roles, LocalDateTime.now(), 1L, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
-            photoService.addDefaultPhoto(getByUsername("Ahti"));
+            photoService.addDefaultPhoto(getByUsername("Väinämöinen"));
         }
     }
     

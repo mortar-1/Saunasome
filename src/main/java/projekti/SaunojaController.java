@@ -150,5 +150,12 @@ public class SaunojaController {
 
         saunojaService.createSomeSaunojas();
     }
+    
+    @PostConstruct
+    @Profile("production")
+    public void atStartInProduction() throws IOException {
+
+        saunojaService.createGodForProduction();
+    }
 
 }
