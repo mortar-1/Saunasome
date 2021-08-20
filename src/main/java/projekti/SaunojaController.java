@@ -63,7 +63,7 @@ public class SaunojaController {
         if (saunojaService.hasErrorsOnRegistration(newSaunoja, bindingResult)) {
 
             saunojaService.addCurrentSaunojaToModel(model);
-            
+
             saunojaService.addValuesFromBeforeToModel(model, newSaunoja);
 
             return "register";
@@ -114,7 +114,7 @@ public class SaunojaController {
     @Transactional
     @PostMapping(path = "/saunojat/{username}/follow")
     public String follow(@RequestParam String action, @PathVariable String username) throws UnsupportedEncodingException {
-        
+
         Saunoja subject = saunojaService.getCurrentSaunoja();
 
         Saunoja object = saunojaService.getByUsername(username);
@@ -135,12 +135,39 @@ public class SaunojaController {
 
         return "redirect:/saunojat/" + encodedUsername;
     }
-    
+
     @PostMapping("/saunojat/{username}/delete")
     public String deleteSaunoja(@PathVariable String username) {
-        
+
         saunojaService.deleteSaunoja(username);
-        
+
+        return "redirect:/wall";
+    }
+
+    @GetMapping("/salasana")
+    public String viewUpdatePassword(Model model, @ModelAttribute NewPassword newPassword) {
+
+        saunojaService.addCurrentSaunojaToModel(model);
+
+        saunojaService.addFollowingFollowedByBlockedToModel(model);
+
+        return "updatePassword";
+    }
+
+    @PostMapping("/salasana")
+    public String updatePassword(Model model, @Valid @ModelAttribute NewPassword newPassword, BindingResult bindingResult) throws UnsupportedEncodingException {
+
+        if (saunojaService.hasErrorsOnPasswordUpdate(newPassword, bindingResult)) {
+
+            saunojaService.addCurrentSaunojaToModel(model);
+
+            saunojaService.addFollowingFollowedByBlockedToModel(model);
+
+            return "updatePassword";
+        }
+
+        saunojaService.updatePassword(newPassword);
+
         return "redirect:/wall";
     }
 
@@ -150,7 +177,7 @@ public class SaunojaController {
 
         saunojaService.createSomeSaunojas();
     }
-    
+
     @PostConstruct
     @Profile("production")
     public void atStartInProduction() throws IOException {

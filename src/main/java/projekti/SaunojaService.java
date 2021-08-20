@@ -33,7 +33,7 @@ public class SaunojaService {
 
     @Autowired
     private NotificationService notificationService;
-    
+
     @Autowired
     private DeletedSaunojaRepository deletedSaunojaRepository;
 
@@ -139,12 +139,11 @@ public class SaunojaService {
 
             bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus on varattu.");
         }
-        
+
         if (deletedSaunojaRepository.findByUsernameIgnoreCase(newSaunoja.getUsername()) != null) {
 
             bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnuksen käyttö on estetty.");
         }
-        
 
         if (newSaunoja.getUsername().contains(" ")) {
 
@@ -172,20 +171,20 @@ public class SaunojaService {
 
         model.addAttribute("usernameFromBefore", newSaunoja.getUsername());
     }
-    
+
     public void createNewAccount(NewSaunoja newSaunoja) throws IOException {
 
         String username = newSaunoja.getUsername();
-        
+
         String firstName = newSaunoja.getFirstName();
-        
+
         String lastName = newSaunoja.getLastName();
-        
+
         String password = newSaunoja.getPassword();
-        
+
         MultipartFile photo = newSaunoja.getPhoto();
 
-        if (saunojaRepository.findByUsernameIgnoreCase(username) != null && deletedSaunojaRepository.findByUsernameIgnoreCase(username) != null ) {
+        if (saunojaRepository.findByUsernameIgnoreCase(username) != null && deletedSaunojaRepository.findByUsernameIgnoreCase(username) != null) {
 
             return;
         }
@@ -251,7 +250,7 @@ public class SaunojaService {
             followRespository.deleteByFollowerAndFollowed(follower, followed);
         }
     }
-    
+
     @PreAuthorize("!#blocked.roles.contains('ADMIN')")
     public void block(Saunoja blocker, Saunoja blocked) {
 
@@ -455,15 +454,41 @@ public class SaunojaService {
         Saunoja saunoja = saunojaRepository.findByUsername(username);
 
         if (saunoja != null) {
-                        
+
             saunoja.getRoles().clear();
 
             saunojaRepository.save(saunoja);
 
             saunojaRepository.delete(saunoja);
-            
+
             deletedSaunojaRepository.save(new DeletedSaunoja(username, LocalDateTime.now()));
         }
+    }
+
+    public Boolean hasErrorsOnPasswordUpdate(NewPassword newPassword, BindingResult bindingResult) {
+        
+        String currentPassword = getCurrentSaunoja().getPassword();
+
+        if (!passwordEncoder.matches(newPassword.getOldPassword(), currentPassword)) {
+
+            bindingResult.rejectValue("oldPassword", "error.newPassword", "Salasana väärin.");
+        }
+
+        if (!newPassword.getNewPassword().equals(newPassword.getConfirmNewPassword())) {
+
+            bindingResult.rejectValue("confirmNewPassword", "error.newPassword", "Salasanat eivät täsmää.");
+        }
+
+        return bindingResult.hasErrors();
+    }
+
+    public void updatePassword(NewPassword newPassword) {
+
+        Saunoja saunoja = getCurrentSaunoja();
+
+        saunoja.setPassword(passwordEncoder.encode(newPassword.getNewPassword()));
+
+        saunojaRepository.save(saunoja);
     }
 
     public void createSomeSaunojas() throws IOException {
@@ -495,9 +520,9 @@ public class SaunojaService {
             photoService.addDefaultPhoto(getByUsername("Ahti"));
         }
     }
-    
+
     public void createGodForProduction() throws IOException {
-        
+
         if (saunojaRepository.findAll().isEmpty()) {
 
             List<String> roles = new ArrayList<>();
@@ -513,6 +538,5 @@ public class SaunojaService {
             photoService.addDefaultPhoto(getByUsername("Väinämöinen"));
         }
     }
-    
 
 }
