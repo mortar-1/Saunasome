@@ -121,7 +121,7 @@ public class MessageService {
 
         Message message = newEmptyMessage();
 
-        message.setAuthor(saunojaService.getByUsername("Ahti"));
+        message.setAuthor(saunojaService.getByUsername("Väinämöinen"));
 
         message.setContent("Tervetuloa leppoisaan seuraamme " + saunojaService.getCurrentUsername()
                 + "! Istut nyt lauteilla. Täällä kuulet kaikki vitsit ja tarinat niiltä saunojilta, joita sinä päätät kuunnella. Klikkaamalla omaa profiilikuvaasi sivun ylälaidassa, saat näkyviin ne saunojat joita sinä kuuntelet ja jotka kuuntelevat sinua. Hyviä löylyjä!");

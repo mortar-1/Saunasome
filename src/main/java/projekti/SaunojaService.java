@@ -514,27 +514,18 @@ public class SaunojaService {
 
                 saunojaRepository.save(new Saunoja("Saunatonttu", passwordEncoder.encode("!Sauna5"), "Sauna", "Tonttu", roles, LocalDateTime.now(), 1L, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
-                roles.add("GOD");
-
-                saunojaRepository.save(new Saunoja("Ahti", passwordEncoder.encode("!Sauna5"), "Ville", "Väinämöinen", roles, LocalDateTime.now(), 1L, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-
                 photoService.addDefaultPhoto(getByUsername("landepaukku"));
 
                 photoService.addDefaultPhoto(getByUsername("voikukka"));
 
                 photoService.addDefaultPhoto(getByUsername("Saunatonttu"));
-
-                photoService.addDefaultPhoto(getByUsername("Ahti"));
             }
         }
-        
-        if (Arrays.asList(environment.getActiveProfiles()).contains("production")) {
 
-            createGodForProduction();
-        }
+        createGod();
     }
 
-    public void createGodForProduction() throws IOException {
+    public void createGod() throws IOException {
 
         if (saunojaRepository.findAll().isEmpty()) {
 
