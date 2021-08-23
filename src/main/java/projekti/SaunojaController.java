@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,7 +35,7 @@ public class SaunojaController {
 
     @Autowired
     private AccountFreezeService accountFreezeService;
-
+        
     private List<Saunoja> saunojat = new ArrayList<>();
 
     @GetMapping("/main")
@@ -172,17 +173,9 @@ public class SaunojaController {
     }
 
     @PostConstruct
-    @Profile("dev")
     public void atStart() throws IOException {
-
+                
         saunojaService.createSomeSaunojas();
     }
-
-    @PostConstruct
-    @Profile("production")
-    public void atStartInProduction() throws IOException {
-
-        saunojaService.createGodForProduction();
-    }
-
+   
 }

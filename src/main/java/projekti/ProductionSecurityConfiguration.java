@@ -15,7 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @Profile("production")
-@EnableGlobalMethodSecurity(securedEnabled = true, proxyTargetClass = true)
+@EnableGlobalMethodSecurity(
+        securedEnabled = true,
+        proxyTargetClass = true,
+        prePostEnabled = true,
+        jsr250Enabled = true)
 @EnableWebSecurity
 public class ProductionSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
