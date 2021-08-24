@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
@@ -257,7 +258,7 @@ public class PhotoService {
     }
 
     @PreAuthorize("#usernameAuthor == authentication.principal.username or hasAuthority('ADMIN')")
-    public void deletePhoto(Long id, String usernameAuthor) throws IOException {
+    public String deletePhoto(Long id, String usernameAuthor) throws IOException {
 
         Photo photo = photoRepository.getOne(id);
 
@@ -284,6 +285,8 @@ public class PhotoService {
         }
 
         photoRepository.delete(photo);
+        
+        return "redirect:/saunojat/" + URLEncoder.encode(author.getUsername(), "UTF-8");
     }
 
 }

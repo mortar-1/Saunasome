@@ -74,18 +74,16 @@ public class PhotoController {
         }
 
         photoService.addNewPhoto(author, newPhoto.getPhoto().getBytes(), newPhoto.getDescription(), isProfilepicture, false);
-        
+
         String encodedUsername = URLEncoder.encode(username, "UTF-8");
 
         return "redirect:/saunojat/" + encodedUsername;
     }
 
     @PostMapping("/photo/{id}/delete")
-    public String deletePhoto(@PathVariable Long id, @RequestParam String redirectTo, @RequestParam String usernameAuthor) throws IOException {
+    public String deletePhoto(@PathVariable Long id, @RequestParam String usernameAuthor) throws IOException {
 
-        photoService.deletePhoto(id, usernameAuthor);
-
-        return "redirect:" + redirectTo;
+        return photoService.deletePhoto(id, usernameAuthor);
     }
 
     @PostMapping("/photo/{id}/like")

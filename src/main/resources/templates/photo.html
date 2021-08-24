@@ -56,7 +56,7 @@
 
                 <hr class="w3-clear"/>
 
-                <!-- LIKE CONTROL -->
+                <!-- LIKE CONTROL AND DELETE -->
 
                 <button th:unless="${photo.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('likePhoto').click()"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(photo.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
                 <button th:if="${photo.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('unlikePhoto').click()"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(photo.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
@@ -77,7 +77,6 @@
 
                 <form method="POST" th:action="@{'/photo/' + ${photo.Id} + '/delete'}">
                     <input type="hidden" name="usernameAuthor" th:value="${photo.author.username}"/>
-                    <input type="hidden" name="redirectTo" th:value="${'/saunojat/' + photo.author.username}"/>
                     <input type="submit" style="display:none" id="deletePhoto"/>
                 </form>
 
