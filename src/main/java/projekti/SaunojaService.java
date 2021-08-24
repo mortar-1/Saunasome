@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,9 +15,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -452,9 +457,32 @@ public class SaunojaService {
 
         saunojaRepository.save(saunoja);
     }
+    
+    public Boolean hasErrorsOnAccountDeletion(newDeleteAccount newDeleteAccount, BindingResult bindingResult) {
+        
+        String currentPassword = getCurrentSaunoja().getPassword();
 
-    @PreAuthorize("hasAuthority('GOD')")
-    public void deleteSaunoja(String username) {
+        if (!passwordEncoder.matches(newDeleteAccount.getPassword(), currentPassword)) {
+
+            bindingResult.rejectValue("password", "error.newDeleteAccount", "Salasana väärin.");
+        }
+                
+        return bindingResult.hasErrors();
+    }
+
+    @PreAuthorize("#username == authentication.principal.username or hasAuthority('GOD')")
+    public String deleteSaunoja(String username) {
+
+        String returnString = "redirect:/wall";
+
+        if (!getCurrentSaunoja().getRoles().contains("GOD")) {
+
+            returnString = "redirect:/main?accountDeleted=true";
+
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+            logout(request);
+        }
 
         Saunoja saunoja = saunojaRepository.findByUsername(username);
 
@@ -468,6 +496,9 @@ public class SaunojaService {
 
             deletedSaunojaRepository.save(new DeletedSaunoja(username, LocalDateTime.now()));
         }
+
+        return returnString;
+
     }
 
     public Boolean hasErrorsOnPasswordUpdate(NewPassword newPassword, BindingResult bindingResult) {
@@ -498,9 +529,11 @@ public class SaunojaService {
 
     public void createSomeSaunojas() throws IOException {
 
-        if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
+        if (saunojaRepository.findAll().isEmpty()) {
+            
+            createGod();
 
-            if (saunojaRepository.findAll().isEmpty()) {
+            if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
 
                 List<String> roles = new ArrayList<>();
 
@@ -521,26 +554,27 @@ public class SaunojaService {
                 photoService.addDefaultPhoto(getByUsername("Saunatonttu"));
             }
         }
-
-        createGod();
     }
 
     public void createGod() throws IOException {
 
-        if (saunojaRepository.findAll().isEmpty()) {
+        List<String> roles = new ArrayList<>();
 
-            List<String> roles = new ArrayList<>();
+        roles.add("USER");
 
-            roles.add("USER");
+        roles.add("ADMIN");
 
-            roles.add("ADMIN");
+        roles.add("GOD");
 
-            roles.add("GOD");
+        saunojaRepository.save(new Saunoja("Väinämöinen", passwordEncoder.encode("!Sauna5"), "Ariel", "Mörtengren", roles, LocalDateTime.now(), 1L, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
-            saunojaRepository.save(new Saunoja("Väinämöinen", passwordEncoder.encode("!Sauna5"), "Ariel", "Mörtengren", roles, LocalDateTime.now(), 1L, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+        photoService.addDefaultPhoto(getByUsername("Väinämöinen"));
 
-            photoService.addDefaultPhoto(getByUsername("Väinämöinen"));
-        }
+    }
+
+    public void logout(HttpServletRequest request) {
+
+        new SecurityContextLogoutHandler().logout(request, null, null);
     }
 
 }

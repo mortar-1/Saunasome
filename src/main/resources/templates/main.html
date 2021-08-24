@@ -24,6 +24,9 @@
                         <div th:if="${param.created}" class="alert alert-success"> 
                             Tilin luonti onnistui!
                         </div>
+                        <div th:if="${param.accountDeleted}" class="alert alert-success"> 
+                            Tili poistettiin onnistuneesti.
+                        </div>
                         <label for="username">Löylytunnus</label>
                         <input type="text" id="username" name="username"/>        
                         <label for="password">Salasana</label>

@@ -9,11 +9,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -35,7 +30,7 @@ public class SaunojaController {
 
     @Autowired
     private AccountFreezeService accountFreezeService;
-        
+
     private List<Saunoja> saunojat = new ArrayList<>();
 
     @GetMapping("/main")
@@ -138,24 +133,31 @@ public class SaunojaController {
     }
 
     @PostMapping("/saunojat/{username}/delete")
-    public String deleteSaunoja(@PathVariable String username) {
+    public String deleteSaunoja(Model model, @PathVariable String username, @Valid @ModelAttribute newDeleteAccount newDeleteAccount, BindingResult bindingResult, @ModelAttribute NewPassword newPassword) {
+        
+        if (saunojaService.hasErrorsOnAccountDeletion(newDeleteAccount, bindingResult)) {
+            
+            saunojaService.addCurrentSaunojaToModel(model);
 
-        saunojaService.deleteSaunoja(username);
-
-        return "redirect:/wall";
+            saunojaService.addFollowingFollowedByBlockedToModel(model);
+            
+            return "accountManagement";
+        }
+        
+        return saunojaService.deleteSaunoja(username);
     }
 
-    @GetMapping("/salasana")
-    public String viewUpdatePassword(Model model, @ModelAttribute NewPassword newPassword) {
+    @GetMapping("/tili")
+    public String viewAccountManagement(Model model, @ModelAttribute NewPassword newPassword, @ModelAttribute newDeleteAccount newDeleteAccount) {
 
         saunojaService.addCurrentSaunojaToModel(model);
 
         saunojaService.addFollowingFollowedByBlockedToModel(model);
 
-        return "updatePassword";
+        return "accountManagement";
     }
 
-    @PostMapping("/salasana")
+    @PostMapping("/tili")
     public String updatePassword(Model model, @Valid @ModelAttribute NewPassword newPassword, BindingResult bindingResult) throws UnsupportedEncodingException {
 
         if (saunojaService.hasErrorsOnPasswordUpdate(newPassword, bindingResult)) {
@@ -164,7 +166,7 @@ public class SaunojaController {
 
             saunojaService.addFollowingFollowedByBlockedToModel(model);
 
-            return "updatePassword";
+            return "accountManagement";
         }
 
         saunojaService.updatePassword(newPassword);
@@ -174,8 +176,8 @@ public class SaunojaController {
 
     @PostConstruct
     public void atStart() throws IOException {
-                
+
         saunojaService.createSomeSaunojas();
     }
-   
+
 }

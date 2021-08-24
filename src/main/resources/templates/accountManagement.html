@@ -9,9 +9,9 @@
 
         <div th:replace="fragments/layout :: sidebar"></div>
 
-        <br/>
-
         <div class="container" style="margin-top:30px">
+            
+            <!-- UPDATE PASSWORD -->
 
             <div>
                 <form th:action="@{/salasana}" method="POST" th:object="${newPassword}">               
@@ -41,7 +41,6 @@
 
                         <hr/>
 
-
                         <div id="file-filename" style="color: greenyellow"></div>
                         <br/>
 
@@ -52,6 +51,45 @@
                     </fieldset>
                 </form>
             </div>
+            
+            <!-- DELETE ACCOUNT -->
+            
+            <br/>
+            
+            <div th:unless="${currentSaunoja.roles.contains('GOD')}">
+                <form th:action="@{'/saunojat/' + ${currentSaunoja.username} + '/delete'}" method="POST" th:object="${newDeleteAccount}">               
+
+                    <fieldset>
+                        <legend>Poista tili</legend>
+
+                        <hr/>
+                        
+                        <div class="alert alert-error" style="color: red"> 
+                            TILIN POISTAMINEN ON PERUUTTAMATONTA. KAIKKI VIESTISI, KOMMENTTISI JA KUVASI POISTUVAT SAMALLA. LÖYLYTUNNUSTA EI VOI REKISTERÖIDÄ UUDESTAAN.
+                        </div>
+                        
+                        <div th:if="${#fields.hasErrors('password')}" class="alert alert-error" style="color: red">
+                            <br/>
+                            Väärä salasana.
+                        </div>
+                        
+                        <input autocomplete="new-password" placeholder="salasana" class="form-control" type="password" id="password" name="password"/>
+                        <br/>
+
+                        <hr/>
+
+                        <div id="file-filename" style="color: greenyellow"></div>
+                        <br/>
+
+                        <div>
+                            <button type="submit" class="w3-button w3-theme-d1 w3-margin-bottom w3-right"><i class="fa fa-user-times"></i> Poista tili </button>
+                        </div>
+
+                    </fieldset>
+                </form>
+            </div>
+            
+            <br/>
 
         </div>
 
