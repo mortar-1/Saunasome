@@ -3,6 +3,7 @@ package projekti;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.h2.util.IOUtils;
@@ -61,20 +62,22 @@ public class PhotoController {
     @PostMapping("/saunojat/{username}/photo")
     public String addPhoto(Model model, @PathVariable String username, @Valid @ModelAttribute NewPhoto newPhoto, @RequestParam(defaultValue = "false") boolean isProfilepicture, BindingResult bindingResult) throws IOException {
 
-        Saunoja author  = saunojaService.getByUsername(username);
-        
+        Saunoja author = saunojaService.getByUsername(username);
+
         if (photoService.hasErrorsOnAddingNewPhoto(author, newPhoto, bindingResult)) {
 
             saunojaService.addAttributesToModelForPageSaunoja(model, username);
-                        
+
             model.addAttribute("descriptionFromBefore", newPhoto.getDescription());
 
             return "saunoja";
         }
 
         photoService.addNewPhoto(author, newPhoto.getPhoto().getBytes(), newPhoto.getDescription(), isProfilepicture, false);
+        
+        String encodedUsername = URLEncoder.encode(username, "UTF-8");
 
-        return "redirect:/saunojat/" + username;
+        return "redirect:/saunojat/" + encodedUsername;
     }
 
     @PostMapping("/photo/{id}/delete")
