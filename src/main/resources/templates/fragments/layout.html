@@ -57,10 +57,15 @@
 
         <!--NAVBAR-->
         <header th:fragment="navbar">
-            <nav class="navbar navbar-expand-sm bg-info navbar-dark">
+            <nav class="navbar navbar-expand-md bg-info navbar-dark">
 
                 <a th:href="@{/main}"><img th:src="@{/logo.png}" alt="Sauna" class="navbar-brand" style="height:45px"/></a>
-                <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+                <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button> 
+
+                <div class="collapse navbar-collapse" id="navbar">
                     <ul class="navbar-nav">
                         <li sec:authorize="hasAuthority('USER')" class="nav-item">
                             <a class="nav-link" th:href="@{/wall}" style="font-family: 'Harrington'; color: white; font-size: 20px">Lauteet</a>
@@ -75,8 +80,15 @@
                             <a class="nav-link" th:href="@{/notifications}" style="font-family: 'Harrington'; color: white; font-size: 20px">Yksityisilmoitukset</a>
                         </li>
                     </ul>
+
                 </div>  
+
             </nav>
+
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
         </header>
 
         <!--SIDEBAR-->
@@ -100,7 +112,7 @@
             <div class="w3-sidebar w3-bar-block w3-border-right w3-border-top" style="display:none" id="mySidebar">
 
                 <button type="button" class="w3-bar-item w3-button w3-hover-none w3-hover-text-green" onclick="document.getElementById('logout').click()"> Kirjaudu ulos </button>
-                
+
                 <a th:href="@{/tili}"> <button type="button" class="w3-bar-item w3-button w3-hover-none w3-hover-text-green"> Hallinnoi tiliä </button> </a>
 
                 <form th:action="@{/logout}">
