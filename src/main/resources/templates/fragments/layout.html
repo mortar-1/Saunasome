@@ -61,7 +61,7 @@
 
                 <a th:href="@{/main}"><img th:src="@{/logo.png}" alt="Sauna" class="navbar-brand" style="height:45px"/></a>
 
-                <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <button sec:authorize="isAuthenticated()" class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button> 
 
