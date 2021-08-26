@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -449,6 +448,7 @@ public class SaunojaService {
         saunojaRepository.save(saunoja);
     }
 
+    // USED IN ACCOUNTFREEZESERVICE
     public void removeFreezeFromRoles(String username) {
 
         Saunoja saunoja = getByUsername(username);
@@ -457,6 +457,7 @@ public class SaunojaService {
 
         saunojaRepository.save(saunoja);
     }
+    
     
     public Boolean hasErrorsOnAccountDeletion(newDeleteAccount newDeleteAccount, BindingResult bindingResult) {
         

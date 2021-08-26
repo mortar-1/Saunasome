@@ -1,10 +1,8 @@
 package projekti;
 
 import java.time.LocalDateTime;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

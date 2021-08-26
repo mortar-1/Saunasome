@@ -89,7 +89,7 @@ class AccountFreezeService {
         saunojaService.removeFreezeFromRoles(username);
     }
 
-    public void checkIfFrozen(Model model) {
+    public void checkIfFrozen(Model model) {    
 
         Saunoja saunoja = saunojaService.getCurrentSaunoja();
 

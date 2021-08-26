@@ -23,10 +23,10 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Data
 public class Photo extends AbstractPersistable<Long> {
 
-    @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
     @Basic(fetch = FetchType.LAZY)
     private byte[] content;
-    
+
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Saunoja author;
@@ -41,5 +41,5 @@ public class Photo extends AbstractPersistable<Long> {
     private List<Comment> comments;
 
     private LocalDateTime created;
-        
+
 }
