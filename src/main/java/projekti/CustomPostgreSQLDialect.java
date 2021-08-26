@@ -8,7 +8,9 @@ public class CustomPostgreSQLDialect extends PostgreSQL82Dialect {
 
     @Override
     public SqlTypeDescriptor remapSqlTypeDescriptor(SqlTypeDescriptor sqlTypeDescriptor) {
+        
         if (sqlTypeDescriptor.getSqlType() == java.sql.Types.BLOB) {
+            
             return BinaryTypeDescriptor.INSTANCE;
         }
         return super.remapSqlTypeDescriptor(sqlTypeDescriptor);

@@ -14,7 +14,6 @@ import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
@@ -23,7 +22,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Data
 public class Photo extends AbstractPersistable<Long> {
 
-    @Type(type = "org.hibernate.type.BinaryType")
+    @Lob
     @Basic(fetch = FetchType.LAZY)
     private byte[] content;
 
