@@ -19,16 +19,16 @@ class AccountFreezeService {
     private SaunojaService saunojaService;
 
     @PreAuthorize("hasAuthority('GOD')")
-    public void freezeAccount(String username, NewAccountFreeze newAccountFreeze) {
+    public void freezeAccount(String username, NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze) {
         
-        if (Pattern.matches("[1-9]+", newAccountFreeze.getTimeToExpiration())) {
+        if (Pattern.matches("[1-9]+", newNotiflicationOrAccountFreeze.getTimeToExpiration())) {
             
             return;
         }
         
-        Integer timeToExpiration = Integer.valueOf(newAccountFreeze.getTimeToExpiration());
+        Integer timeToExpiration = Integer.valueOf(newNotiflicationOrAccountFreeze.getTimeToExpiration());
         
-        String timeUnit = newAccountFreeze.getTimeUnit();
+        String timeUnit = newNotiflicationOrAccountFreeze.getTimeUnit();
                 
         AccountFreeze accountFreeze = new AccountFreeze();
 
@@ -66,14 +66,14 @@ class AccountFreezeService {
         accountFreezeRepository.save(accountFreeze);
     }
 
-    public Boolean hasErrorsOnCreation(NewAccountFreeze newAccountFreeze, BindingResult bindingResult) {
+    public Boolean hasErrorsOnCreation(NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze, BindingResult bindingResult) {
 
-        if (newAccountFreeze.getTimeToExpiration().isBlank() && !newAccountFreeze.getTimeUnit().equalsIgnoreCase("forever")) {
+        if (newNotiflicationOrAccountFreeze.getTimeToExpiration().isBlank() && !newNotiflicationOrAccountFreeze.getTimeUnit().equalsIgnoreCase("forever")) {
 
             bindingResult.rejectValue("timeToExpiration", "error.newAccountFreeze", "Täsmennä luvulla avannossaolo aika.");
         }
         
-        if (!Pattern.matches("[0-9]+", newAccountFreeze.getTimeToExpiration())) {
+        if (!Pattern.matches("[0-9]+", newNotiflicationOrAccountFreeze.getTimeToExpiration())) {
             
             bindingResult.rejectValue("timeToExpiration", "error.newAccountFreeze", "Syötä vain numeroita.");
         }

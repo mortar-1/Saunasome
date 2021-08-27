@@ -67,7 +67,10 @@
 
                             <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('file').click()" style="white-space: nowrap"><i class="fa fa-file-image-o w3-left"></i>&nbsp; Valitse profiilikuva </button>
 
-                            <button type="submit" class="w3-button w3-theme-d1 w3-margin-bottom w3-right"><i class="fa fa-plus"></i> Luo saunoja!</button>
+                            <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-right" onclick="document.getElementById('submit').click(); this.disabled=true;" ><i class="fa fa-plus"></i> Luo saunoja!</button>
+
+                            <input type="submit" style="display: none" id="submit"/>                     
+
                         </div>
 
                         <input type="file" name="photo" style="display:none;" id="file"/>

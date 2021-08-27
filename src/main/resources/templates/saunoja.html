@@ -76,11 +76,11 @@
 
                     <div sec:authorize="hasAuthority('GOD')" th:if="${!saunoja.username.equals(currentSaunoja.username)}">
 
-                        <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/freeze'}" method="POST" th:object="${newAccountFreeze}">
-                            <div th:if="${#fields.hasErrors('timeToExpiration')}" th:errors="*{timeToExpiration}" class="alert alert-error">    
+                        <form sec:authorize="hasAuthority('GOD')" th:unless="${saunoja.roles.contains('FROZEN')}" th:action="@{'/saunojat/' + ${saunoja.username} + '/freeze'}" method="POST" th:object="${newNotiflicationOrAccountFreeze}">
+                            <div th:if="${#fields.hasErrors('timeToExpiration')}" th:errors="*{timeToExpiration}" class="alert alert-error" style="color: red">    
                                 Viestin virheviesti.
                             </div>
-                            <input type="text" name="timeToExpiration" placeholder="kuinka monta..."/>
+                            <input type="text" name="timeToExpiration" placeholder="Kuinka monta..."/>
                             <br/>
                             <br/>
                             <p><input type="radio" name="timeUnit" value="min"/> &nbsp; minuuttia </p>
@@ -169,15 +169,15 @@
                         </form>
                     </div>
 
-                    <!-- PRIVATE MESSAGE FROM ADMIN -->
+                    <!-- NOTIFICATION FROM ADMIN -->
 
                     <div sec:authorize="hasAuthority('ADMIN')" th:unless="${saunoja.username.equals(currentSaunoja.username)}">
 
                         <br/>
 
-                        <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}" id="newNotificationForm" th:object="${newNotification}">
+                        <form method="POST" th:action="@{'/saunojat/' + ${saunoja.username} + '/notificate'}" id="newNotificationForm" th:object="${newNotiflicationOrAccountFreeze}">
 
-                            <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="alert alert-error">    
+                            <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="alert alert-error" style="color: red">    
                                 Viestin virheviesti.
                                 <hr/>
                             </div>
@@ -199,7 +199,7 @@
 
                             <input type="hidden" name="content" value="Korjaa käytöstäsi, tai sinut laitetaan avantoon!"/>
 
-                            <input type="hidden" name="isAlert" value="=true"/>
+                            <input type="hidden" name="isAlert" value="true"/>
 
                             <input type="submit" style="display: none" th:id="sendTakeItEasyNotification"/>
                         </form>

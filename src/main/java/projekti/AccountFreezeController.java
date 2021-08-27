@@ -22,16 +22,16 @@ public class AccountFreezeController {
     
     
     @PostMapping("/saunojat/{username}/freeze")
-    public String freezeAccount(Model model, @PathVariable String username, @Valid @ModelAttribute NewAccountFreeze newAccountFreeze, BindingResult bindingResult) throws UnsupportedEncodingException {
+    public String freezeAccount(Model model, @PathVariable String username, @Valid @ModelAttribute NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze, BindingResult bindingResult) throws UnsupportedEncodingException {
         
-        if(accountFreezeService.hasErrorsOnCreation(newAccountFreeze, bindingResult)) {
+        if(accountFreezeService.hasErrorsOnCreation(newNotiflicationOrAccountFreeze, bindingResult)) {
             
             saunojaService.addAttributesToModelForPageSaunoja(model, username);
             
             return "saunoja";
         }
         
-        accountFreezeService.freezeAccount(username, newAccountFreeze);
+        accountFreezeService.freezeAccount(username, newNotiflicationOrAccountFreeze);
        
         String encodedUsername = URLEncoder.encode(username, "UTF-8");
 

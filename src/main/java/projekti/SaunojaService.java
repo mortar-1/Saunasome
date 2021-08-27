@@ -381,7 +381,7 @@ public class SaunojaService {
 
                 saunoja.getRoles().add("ADMIN");
 
-                notificationService.newNotification(username, new NewNotification("Sinulla on nyt ADMIN tason käyttöoikeudet.", Boolean.FALSE));
+                notificationService.newNotification(username, new NewNotiflicationOrAccountFreeze("Sinulla on nyt ADMIN tason käyttöoikeudet.", Boolean.FALSE, null, null));
             }
         }
 
@@ -391,7 +391,7 @@ public class SaunojaService {
 
                 saunoja.getRoles().remove("ADMIN");
 
-                notificationService.newNotification(username, new NewNotification("Sinulta poistettiin ADMIN tason käyttöoikeudet.", Boolean.TRUE));
+                notificationService.newNotification(username, new NewNotiflicationOrAccountFreeze("Sinulta poistettiin ADMIN tason käyttöoikeudet.", Boolean.TRUE, null, null));
             }
         }
 
@@ -401,7 +401,7 @@ public class SaunojaService {
 
                 saunoja.getRoles().add("GOD");
 
-                notificationService.newNotification(username, new NewNotification("Sinulla on nyt GOD tason käyttöoikeudet.", Boolean.FALSE));
+                notificationService.newNotification(username, new NewNotiflicationOrAccountFreeze("Sinulla on nyt GOD tason käyttöoikeudet.", Boolean.FALSE, null, null));
             }
         }
 
@@ -411,7 +411,7 @@ public class SaunojaService {
 
                 saunoja.getRoles().remove("GOD");
 
-                notificationService.newNotification(username, new NewNotification("Sinulta poistettiin GOD tason käyttöoikeudet.", Boolean.TRUE));
+                notificationService.newNotification(username, new NewNotiflicationOrAccountFreeze("Sinulta poistettiin GOD tason käyttöoikeudet.", Boolean.TRUE, null, null));
             }
         }
 
@@ -431,7 +431,7 @@ public class SaunojaService {
 
                 saunoja.getRoles().add("FROZEN");
 
-                notificationService.newNotification(username, new NewNotification("Sinut laitettiin avantoon.", Boolean.TRUE));
+                notificationService.newNotification(username, new NewNotiflicationOrAccountFreeze("Sinut laitettiin avantoon.", Boolean.TRUE, null, null));
             }
         }
 
@@ -441,7 +441,7 @@ public class SaunojaService {
 
                 saunoja.getRoles().remove("FROZEN");
 
-                notificationService.newNotification(username, new NewNotification("Sinut otettiin takaisin avannosta.", Boolean.FALSE));
+                notificationService.newNotification(username, new NewNotiflicationOrAccountFreeze("Sinut otettiin takaisin avannosta.", Boolean.FALSE, null, null));
             }
         }
 

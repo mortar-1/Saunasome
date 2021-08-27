@@ -26,7 +26,7 @@ public class NotificationService {
         saunojaService.addFollowingFollowedByBlockedToModel(model);
     }
 
-    public void newNotification(String username, NewNotification newNotification) {
+    public void newNotification(String username, NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze) {
 
         Notification notification = new Notification();
 
@@ -34,24 +34,24 @@ public class NotificationService {
 
         notification.setRecipient(saunojaService.getByUsername(username));
 
-        notification.setContent(newNotification.getContent());
+        notification.setContent(newNotiflicationOrAccountFreeze.getContent());
 
         notification.setCreated(LocalDateTime.now());
         
-        notification.setIsAlert(newNotification.getIsAlert());
+        notification.setIsAlert(newNotiflicationOrAccountFreeze.getIsAlert());
 
         notificationRepository.save(notification);
 
     }
 
-    public Boolean hasErrorsInNewNotification(NewNotification newNotification, BindingResult bindingResult) {
+    public Boolean hasErrorsInNewNotification(NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze, BindingResult bindingResult) {
 
-        if (newNotification.getContent() != null && newNotification.getContent().length() >= 200) {
+        if (newNotiflicationOrAccountFreeze.getContent() != null && newNotiflicationOrAccountFreeze.getContent().length() >= 200) {
 
             bindingResult.rejectValue("content", "error.newNotification", "Ilmoitus on liian pitkä.");
         }
 
-        if (newNotification.getContent() == null || newNotification.getContent().isBlank()) {
+        if (newNotiflicationOrAccountFreeze.getContent() == null || newNotiflicationOrAccountFreeze.getContent().isBlank()) {
 
             bindingResult.rejectValue("content", "error.newNotification", "Ilmoitus ei saa olla tyhjä.");
         }

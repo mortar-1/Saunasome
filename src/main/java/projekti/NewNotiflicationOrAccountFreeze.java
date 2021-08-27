@@ -7,10 +7,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class NewAccountFreeze {
-    
+public class NewNotiflicationOrAccountFreeze {
+
+    private String content;
+
+    private Boolean isAlert;
+
     private String timeToExpiration;
-    
+
     private String timeUnit;
-        
+
 }

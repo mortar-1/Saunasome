@@ -23,16 +23,16 @@ public class NotificationController {
     private SaunojaService saunojaService;
 
     @PostMapping("/saunojat/{username}/notificate")
-    public String newNotification(Model model, @PathVariable String username, @Valid @ModelAttribute NewNotification newNotification, BindingResult bindingResult) throws UnsupportedEncodingException {
+    public String newNotification(Model model, @PathVariable String username, @Valid @ModelAttribute NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze, BindingResult bindingResult) throws UnsupportedEncodingException {
         
-        if (notificationService.hasErrorsInNewNotification(newNotification, bindingResult)) {
+        if (notificationService.hasErrorsInNewNotification(newNotiflicationOrAccountFreeze, bindingResult)) {
 
             saunojaService.addAttributesToModelForPageSaunoja(model, username);
 
             return "saunoja";
         }
 
-        notificationService.newNotification(username, newNotification);
+        notificationService.newNotification(username, newNotiflicationOrAccountFreeze);
 
         String encodedUsername = URLEncoder.encode(username, "UTF-8");
 
