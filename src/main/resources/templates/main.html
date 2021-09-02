@@ -27,10 +27,8 @@
                         <div th:if="${param.accountDeleted}" class="alert alert-success"> 
                             Tili poistettiin onnistuneesti.
                         </div>
-                        <label for="username">Löylytunnus</label>
-                        <input type="text" id="username" name="username"/>        
-                        <label for="password">Salasana</label>
-                        <input type="password" id="password" name="password"/>    
+                        <input type="text" id="username" name="username" placeholder="Löylytunnus" class="form-control" />        
+                        <input type="password" id="password" name="password" placeholder="Salasana" class="form-control"/>    
                         <div class="form-actions">
                             <button type="submit" class="btn w3-left">Kirjaudu sisään!</button>
                         </div>
