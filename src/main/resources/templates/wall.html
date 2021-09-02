@@ -31,7 +31,7 @@
                     <span class="w3-left w3-opacity" th:unless="${notification.created.toLocalDate().equals(#temporals.createToday())}" th:text="${#temporals.format(notification.created, 'd.M.yy HH:mm')}">Viestin ajankohta</span>
                     <span class="w3-left w3-opacity" th:if="${notification.created.toLocalDate().equals(#temporals.createToday())}" th:text="${' tänään ' + #temporals.format(notification.created, 'HH:mm')}">Viestin ajankohta</span>
                     <button th:if="${notification.recipient == currentSaunoja}" type="button" class="w3-button w3-right" th:attr="onclick=|document.getElementById('delete' + ${notification.id}).click()|"><i class="fa fa-close"></i></button>  
-                    
+
                     <hr class="w3-clear"/>
 
                     <p th:if="${notification.isAlert}" th:text="${notification.content}" style="color: red">Viestin sisältö</p>
@@ -63,7 +63,8 @@
                     <br/>
                     <hr class="w3-clear"/>
 
-                    <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewMessage').click()">Lähetä &nbsp; <i class="fa fa-arrow-circle-right"></i></button>
+                    <button type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewMessage').click()">Lähetä &nbsp; <i class="fa fa-arrow-circle-right"></i></button>
+                    <button type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewMessage').click()"><i class="fa fa-arrow-circle-right"></i></button>
 
                     <input type="submit" style="display: none" th:id="sendNewMessage"/>
                 </form>
@@ -86,15 +87,27 @@
                     <hr class="w3-clear"/>
 
                     <p th:unless="${message.isNewPhotoMessage}" th:text="${message.content}">Viestin sisältö</p>
-                    <a  th:if="${message.isNewPhotoMessage}"  th:href="@{'/photo/' + ${message.photoId} + '/view'}"> <img th:src="@{'/photo/' + ${message.photoId}}" alt="Avatar" class="center" style="height:100px;"/> </a>
-
+                    <a  th:if="${message.isNewPhotoMessage}"  th:href="@{'/photo/' + ${message.photoId} + '/view'}"> <img th:src="@{'/photo/' + ${message.photoId}}" class="center img-thumbnail" style="max-width:  15%; min-width: 70px"/> </a>
+                   
                     <br/>
                     <hr class="w3-clear"/>
-
-                    <button th:unless="${message.likes.contains(currentSaunoja.username) or message.isNewPhotoMessage}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('like' + ${message.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
-                    <button th:if="${message.likes.contains(currentSaunoja.username) and !message.isNewPhotoMessage}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('unlike' + ${message.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
-                    <a th:unless="${message.isNewPhotoMessage}" th:href="@{'/wall/' + ${message.id}}" ><button type="button" class="w3-button w3-theme-d2 w3-margin-bottom"><i class="fa fa-comment"></i> <span th:text="${'Kommentoi(' + #lists.size(message.comments) + ')'}">Kommentointi</span></button></a>
-                    <button th:if="${message.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${message.id}).click()|"><i class="fa fa-close"></i> Poista viesti</button>  
+                    
+                    <!-- LIKE -->
+                    <button th:unless="${message.likes.contains(currentSaunoja.username) or message.isNewPhotoMessage}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('like' + ${message.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
+                    <button th:unless="${message.likes.contains(currentSaunoja.username) or message.isNewPhotoMessage}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('like' + ${message.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
+                    
+                    <!-- UNLIKE -->
+                    <button th:if="${message.likes.contains(currentSaunoja.username) and !message.isNewPhotoMessage}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('unlike' + ${message.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
+                    <button th:if="${message.likes.contains(currentSaunoja.username) and !message.isNewPhotoMessage}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom" th:attr="onclick=|document.getElementById('unlike' + ${message.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
+                    
+                    <!-- COMMENT -->
+                    <a th:unless="${message.isNewPhotoMessage}" th:href="@{'/wall/' + ${message.id}}" ><button type="button" class="bigScreen w3-button w3-theme-d2 w3-margin-bottom"><i class="fa fa-comment"></i> <span th:text="${'Kommentoi(' + #lists.size(message.comments) + ')'}">Kommentointi</span></button></a>
+                    <a th:unless="${message.isNewPhotoMessage}" th:href="@{'/wall/' + ${message.id}}" ><button type="button" class="smallScreen w3-button w3-theme-d2 w3-margin-bottom"><i class="fa fa-comment"></i> <span th:text="${'(' + #lists.size(message.comments) + ')'}">Kommentointi</span></button></a>
+                    
+                    <!-- DELETE -->
+                    <button th:if="${message.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="bigScreen w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${message.id}).click()|"><i class="fa fa-close"></i> Poista viesti</button>  
+                    <button th:if="${message.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="smallScreen w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${message.id}).click()|"><i class="fa fa-close"></i></button>  
+                    
                     <form method="POST" th:action="@{'/wall/' + ${message.Id} + '/delete'}">
                         <input type="hidden" name="usernameAuthor" th:value="${message.author.username}"/>
                         <input type="hidden" name="redirectTo" value="/wall/"/>

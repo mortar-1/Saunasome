@@ -23,10 +23,12 @@
             <div class="card">
                 <div class="card-body">
 
-                    <!-- USERNAME AND NAME -->
+                    <!-- USERNAME AND NAME AND IF FOLLOWING -->
 
                     <h1 th:text="${saunoja.username}" class="card-title text-center" style="font-family: 'Harrington'; color: green">Nimimerkki</h1>
                     <h3 th:text="${saunoja.firstName + ' ' + saunoja.lastName}" class="card-title text-center" style="font-family: 'Harrington'; color: green">Nimi</h3>
+                    <h5 th:if="${isFollowingCurrentSaunoja}" class="card-title text-center" style="font-family: 'Harrington'; color: green" th:text="${'Kuunnellut sinua sitten ' + #temporals.format(followingCurrentSaunojaFromWhen, 'd.M.yyyy')}"> Kuunnellut sinua sitten...</h5>
+                    
                     <hr class="w3-clear"/>
 
                     <!--ROLE CONTROL-->
@@ -115,7 +117,7 @@
 
                     <!-- PROFILE PICTURE -->
 
-                    <a th:href="@{'/photo/' + ${profilePicture.Id} + '/view'}"><img class="center" th:src="@{'/photo/' + ${profilePicture.Id} }" height="200"/></a>
+                    <a th:href="@{'/photo/' + ${profilePicture.Id} + '/view'}"><img class="center" style="width: 50%" th:src="@{'/photo/' + ${profilePicture.Id} }"/></a>
 
                     <br/>
                     <hr class="w3-clear"/>
@@ -126,14 +128,23 @@
 
                     <div th:if="${!saunoja.username.equals(currentSaunoja.username)}">
 
-                        <button th:unless="${isfollowing or saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
-                        <button th:if="${isfollowing and !saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> <span th:text="${'Lakkaa kuuntelemasta (kuunnellut ' + #temporals.format(followCreated, 'd.M.yy') + ' ->)'}"/> </button>
-
-                        <button th:unless="${isfollowing or !saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom center" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
-                        <button th:if="${isfollowing and saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom center" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> <span th:text="${'Lakkaa kuuntelemasta (kuunnellut ' + #temporals.format(followCreated, 'd.M.yy') + ' ->)'}"/> </button>
+                        <button th:unless="${isfollowing or saunoja.roles.contains('ADMIN')}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
+                        <button th:unless="${isfollowing or saunoja.roles.contains('ADMIN')}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i></button>
                         
-                        <button th:unless="${isBlocking or saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i> Estä</button>
-                        <button th:if="${isBlocking and !saunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i> <span th:text="${'Lopeta esto (estänyt ' + #temporals.format(blockCreated, 'd.M.yy') + ' ->)'}"/></button>
+                        <button th:if="${isfollowing and !saunoja.roles.contains('ADMIN')}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> <span th:text="${'Lakkaa kuuntelemasta (kuunnellut ' + #temporals.format(followCreated, 'd.M.yy') + ' ->)'}"/> </button>
+                        <button th:if="${isfollowing and !saunoja.roles.contains('ADMIN')}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> </button>
+
+                        <button th:unless="${isfollowing or !saunoja.roles.contains('ADMIN')}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom center" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i> Kuuntele</button>
+                        <button th:unless="${isfollowing or !saunoja.roles.contains('ADMIN')}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom center" onclick="document.getElementById('follow').click()"><i class="fa fa-volume-up"></i></button>
+                                                
+                        <button th:if="${isfollowing and saunoja.roles.contains('ADMIN')}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom center" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i> <span th:text="${'Lakkaa kuuntelemasta (kuunnellut ' + #temporals.format(followCreated, 'd.M.yy') + ' ->)'}"/> </button>
+                        <button th:if="${isfollowing and saunoja.roles.contains('ADMIN')}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom center" onclick="document.getElementById('unfollow').click()"><i class="fa fa-volume-off"></i></button>
+                        
+                        <button th:unless="${isBlocking or saunoja.roles.contains('ADMIN')}" type="button" class="bigScreen w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i> Estä</button>
+                        <button th:unless="${isBlocking or saunoja.roles.contains('ADMIN')}" type="button" class="smallScreen w3-button w3-theme-d1  w3-right" onclick="document.getElementById('block').click()"><i class="fa fa-eye-slash"></i></button>
+                        
+                        <button th:if="${isBlocking and !saunoja.roles.contains('ADMIN')}" type="button" class="bigScreen w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i> <span th:text="${'Lopeta esto (estänyt ' + #temporals.format(blockCreated, 'd.M.yy') + ' ->)'}"/></button>
+                        <button th:if="${isBlocking and !saunoja.roles.contains('ADMIN')}" type="button" class="smallScreen w3-button w3-theme-d1  w3-right" onclick="document.getElementById('unblock').click()"><i class="fa fa-eye"></i></button>
                         
                         <br th:unless="${saunoja.roles.contains('ADMIN')}"/>
                         <br th:unless="${saunoja.roles.contains('ADMIN')}"/>
@@ -219,7 +230,7 @@
                         <div class="col-4"  th:each="photo : ${photos}">
 
                             <figure class="figure">
-                                <a th:href="@{'/photo/' + ${photo.Id} + '/view'}"><img class="figure-img img-thumbnail" th:src="@{'/photo/' + ${photo.Id} }" height="100"/></a>
+                                <a th:href="@{'/photo/' + ${photo.Id} + '/view'}"><img class="figure-img img-thumbnail" style="min-width: 80px" th:src="@{'/photo/' + ${photo.Id} }"/></a>
                                 <figcaption class="figure-caption" th:text="${photo.description}">Tarina</figcaption>
                             </figure>
 
@@ -251,7 +262,8 @@
 
                             <div>
 
-                                <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('file').click()" style="white-space: nowrap"><i class="fa fa-file-image-o w3-left"></i> &nbsp; Valitse kuva </button>
+                                <button type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('file').click()" style="white-space: nowrap"><i class="fa fa-file-image-o w3-left"></i> &nbsp; Valitse kuva </button>
+                                <button type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('file').click()" style="white-space: nowrap"><i class="fa fa-file-image-o w3-left"></i></button>
 
                                 <div  id="file-filename" class="w3-right" style="color: greenyellow"></div>
 
@@ -266,7 +278,8 @@
                             <p> Asetetaanko kuva profiilikuvaksi? &nbsp;<input type="checkbox" name="isProfilepicture"/></p>
 
                             <div class="form-actions">
-                                <button type="submit" class="w3-button w3-theme-d1 w3-margin-bottom">Lisää kuva <i class="fa fa-upload"></i></button>
+                                <button type="submit" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom">Lisää kuva <i class="fa fa-upload"></i></button>
+                                <button type="submit" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom"><i class="fa fa-upload"></i></button>
                             </div>
                         </fieldset>
                     </form>

@@ -13,16 +13,16 @@
         <div class="container" style="margin-top:30px" th:unless="${authorBlockedUsernames.contains(currentSaunoja.username)}">
 
             <!-- IF FROZEN -->
-            
+
             <div th:if="${currentSaunoja.roles.contains('FROZEN')}">
                 <h3 th:unless="${accountFreeze.expires == null}" style="color: #FF0000" th:text="${accountFreeze.author.username + ' on laittanut sinut avantoon huonon käytöksen vuoksi. Olet avannossa ' + #temporals.format(message.created, 'd.M.yy HH:mm') + ' saakka.'}"  ></h3>
                 <h3 th:if="${accountFreeze.expires == null}" style="color: #FF0000" th:text="${accountFreeze.author.username + ' on laittanut sinut avantoon huonon käytöksen vuoksi. Olet vaipunut horrokseen ikusiksi ajoiksi tai kunnes saunan henget päättävät ottaa sinut takaisin saunaan virkoamaan.'}"  ></h3>
             </div>
-            
+
             <br/>
 
             <br/>
-            
+
             <!-- MESSAGE -->
 
             <div class="w3-container w3-card w3-white w3-round w3-section">
@@ -38,12 +38,18 @@
 
                 <br/>
                 <hr class="w3-clear"/>
-                
+
                 <!-- DELETE AND LIKE CONTROL -->
 
-                <button th:unless="${message.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('like' + ${message.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
-                <button th:if="${message.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('unlike' + ${message.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
-                <button th:if="${message.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${message.id}).click()|"><i class="fa fa-close"></i> Poista viesti</button>  
+                <button th:unless="${message.likes.contains(currentSaunoja.username)}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('like' + ${message.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
+                <button th:unless="${message.likes.contains(currentSaunoja.username)}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('like' + ${message.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
+
+                <button th:if="${message.likes.contains(currentSaunoja.username)}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('unlike' + ${message.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
+                <button th:if="${message.likes.contains(currentSaunoja.username)}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('unlike' + ${message.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'(' + #lists.size(message.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
+
+                <button th:if="${message.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="bigScreen w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${message.id}).click()|"><i class="fa fa-close"></i> Poista viesti</button>  
+                <button th:if="${message.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="smallScreen w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${message.id}).click()|"><i class="fa fa-close"></i></button>
+
                 <form method="POST" th:action="@{'/wall/' + ${message.Id} + '/delete'}">
                     <input type="hidden" name="usernameAuthor" th:value="${message.author.username}"/>
                     <input type="hidden" name="redirectTo" value="/wall/"/>
@@ -60,19 +66,19 @@
                     <input type="submit" style="display:none;" th:id="${'unlike' + message.id}"/>
                 </form>
             </div>
-            
+
             <!-- LIKES -->
-            
+
             <h5 th:unless="${message.likes.isEmpty()}" Style="font-family: 'Harrington'; font-size: 22px">Vihtoneet: </h5>
             <ol>
                 <li th:each="likerUsername : ${message.likes}">
                     <a th:href="@{'/saunojat/' + ${likerUsername}}" th:text="${likerUsername}" Style="font-family: 'Harrington'; color: green; font-size: 18px">Tykkäävä saunoja</a>
                 </li>
             </ol>
-            
+
             <!-- NEW COMMENT -->
 
-            <div th:unless="${currentSaunoja.roles.contains('FROZEN')}" class="w3-container w3-card w3-white w3-round w3-margin">
+            <div th:unless="${currentSaunoja.roles.contains('FROZEN')}" class="w3-container w3-card w3-white w3-round w3-section">
 
                 <br/>
 
@@ -89,14 +95,14 @@
                     <br/>
                     <hr class="w3-clear"/>
 
-                    <button type="button" class="w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewComment').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
-
+                    <button type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewComment').click()">Lähetä <i class="fa fa-arrow-circle-right"></i></button>
+                    <button type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom" onclick="document.getElementById('sendNewComment').click()"><i class="fa fa-arrow-circle-right"></i></button>
 
                     <input type="submit" style="display: none" th:id="sendNewComment"/>
                 </form>
 
             </div>
-            
+
             <!-- COMMENTS -->
 
             <div th:each="comment : ${comments}">
@@ -113,12 +119,17 @@
 
                     <br/>
                     <hr class="w3-clear"/>
-                    
+
                     <!-- DELETE AND LIKE CONTROL -->
 
-                    <button th:unless="${comment.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('like' + ${comment.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
-                    <button th:if="${comment.likes.contains(currentSaunoja.username)}" type="button" class="w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('unlike' + ${comment.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
-                    <button th:if="${comment.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${comment.id}).click()|"><i class="fa fa-close"></i> Poista Kommentti</button>  
+                    <button th:unless="${comment.likes.contains(currentSaunoja.username)}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('like' + ${comment.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'Vihdo(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
+                    <button th:unless="${comment.likes.contains(currentSaunoja.username)}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('like' + ${comment.id}).click()|"><i class="fa fa-thumbs-up"></i> <span th:text="${'(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtominen</span></button>
+
+                    <button th:if="${comment.likes.contains(currentSaunoja.username)}" type="button" class="bigScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('unlike' + ${comment.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'Peru vihtominen(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
+                    <button th:if="${comment.likes.contains(currentSaunoja.username)}" type="button" class="smallScreen w3-button w3-theme-d1 w3-margin-bottom w3-left" th:attr="onclick=|document.getElementById('unlike' + ${comment.id}).click()|"><i class="fa fa-thumbs-down"></i> <span th:text="${'(' + #lists.size(comment.likes) + ')'}" th:remove="tag">Vihtomisen peruminen</span></button>
+
+                    <button th:if="${comment.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="bigScreen w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${comment.id}).click()|"><i class="fa fa-close"></i> Poista Kommentti</button>  
+                    <button th:if="${comment.author == currentSaunoja or currentSaunoja.roles.contains('ADMIN')}" type="button" class="smallScreen w3-button w3-theme-d2 w3-margin-bottom w3-right" th:attr="onclick=|document.getElementById('delete' + ${comment.id}).click()|"><i class="fa fa-close"></i></button>
 
                     <form method="POST" th:action="@{'/comment/' + ${comment.Id} + '/delete'}">
                         <input type="hidden" name="usernameAuthor" th:value="${comment.author.username}"/>

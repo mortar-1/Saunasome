@@ -44,6 +44,7 @@
             background-color: #2196F3;
             padding: 10px;
         }
+
         .grid-item {
             background-color: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(0, 0, 0, 0.8);
@@ -51,6 +52,19 @@
             font-size: 30px;
             text-align: center;
         }
+
+        @media only screen and (max-width: 600px) {
+            .bigScreen {
+                display: none;
+            }
+        }
+
+        @media only screen and (min-width: 600px) {
+            .smallScreen {
+                display: none;
+            }
+        }
+
     </style>
 
     <body>
@@ -96,10 +110,10 @@
 
             <div class="container">
                 <div class="row">
-                    <div class="col-1">
+                    <div class="col-sm-auto">
                         <img th:src="@{'/photo/' + ${currentSaunoja.profilepictureId}}" alt="Avatar" class="w3-circle" style="width:40px; height:40px" onclick="openOrCloseSidebar()" />
                     </div>
-                    <div class="col-11">
+                    <div class="col-sm-auto">
                         <h5 th:text="${currentSaunoja.username}" style="font-family: 'Harrington'; color: green; font-size: 20px">Saunojan käyttäjätunnus</h5>
                     </div>
                 </div>

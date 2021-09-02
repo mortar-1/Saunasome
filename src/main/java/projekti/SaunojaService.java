@@ -296,6 +296,18 @@ public class SaunojaService {
         return followRespository.findByFollowerAndFollowed(follower, followed) == null;
     }
 
+    public void addIsFollowingCurrentSaunojaToModel(Model model, String authorUsername) {
+
+        Saunoja author = getByUsername(authorUsername);
+        
+        if (!isNotFollowing(author, getCurrentSaunoja())) {
+
+            model.addAttribute("isFollowingCurrentSaunoja", "true");
+
+            model.addAttribute("followingCurrentSaunojaFromWhen", followingFromWhen(author, getCurrentSaunoja()));
+        }
+    }
+
     public void addIsFollowingAndIsBlockingToModel(Model model, String objectUsername) {
 
         Saunoja subject = getCurrentSaunoja();
@@ -342,6 +354,8 @@ public class SaunojaService {
         addBlockedByProfilePageAuthor(model, username);
 
         addProfileAuthorToModel(model, username);
+        
+        addIsFollowingCurrentSaunojaToModel(model, username);
     }
 
     public LocalDateTime followingFromWhen(Saunoja follower, Saunoja followed) {
@@ -457,17 +471,16 @@ public class SaunojaService {
 
         saunojaRepository.save(saunoja);
     }
-    
-    
+
     public Boolean hasErrorsOnAccountDeletion(newDeleteAccount newDeleteAccount, BindingResult bindingResult) {
-        
+
         String currentPassword = getCurrentSaunoja().getPassword();
 
         if (!passwordEncoder.matches(newDeleteAccount.getPassword(), currentPassword)) {
 
             bindingResult.rejectValue("password", "error.newDeleteAccount", "Salasana väärin.");
         }
-                
+
         return bindingResult.hasErrors();
     }
 
@@ -531,7 +544,7 @@ public class SaunojaService {
     public void createSomeSaunojas() throws IOException {
 
         if (saunojaRepository.findAll().isEmpty()) {
-            
+
             createGod();
 
             if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
