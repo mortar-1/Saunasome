@@ -190,7 +190,7 @@ public class SaunojaService {
         String lastName = newSaunoja.getLastName();
 
         String password = newSaunoja.getPassword();
-
+        
         MultipartFile photo = newSaunoja.getPhoto();
 
         if (saunojaRepository.findByUsernameIgnoreCase(username) != null && deletedSaunojaRepository.findByUsernameIgnoreCase(username) != null) {
@@ -202,16 +202,23 @@ public class SaunojaService {
 
         roles.add("USER");
 
-        Saunoja saunoja = new Saunoja(username, passwordEncoder.encode(password), firstName, lastName, roles, LocalDateTime.now(), 1L, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        Saunoja saunoja = new Saunoja(username, passwordEncoder.encode(password), firstName, lastName, roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 
         saunojaRepository.save(saunoja);
+        
+        System.out.println("<<<< " + photo + " >>>>");
+                        
+        if (photo != null) {
+            
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!KISSA");
 
-        photoService.addFirstPhoto(photo, getByUsername(username));
+            photoService.addNewPhoto(getByUsername(username), photo.getBytes(), "", true, true);
+        }
     }
 
-    public void setProfilepictureId(Saunoja saunoja, Long id) {
+    public void setProfilePictureId(Saunoja saunoja, Long id) {
 
-        saunoja.setProfilepictureId(id);
+        saunoja.setProfilePictureId(id);
 
         saunojaRepository.save(saunoja);
     }
@@ -299,7 +306,7 @@ public class SaunojaService {
     public void addIsFollowingCurrentSaunojaToModel(Model model, String authorUsername) {
 
         Saunoja author = getByUsername(authorUsername);
-        
+
         if (!isNotFollowing(author, getCurrentSaunoja())) {
 
             model.addAttribute("isFollowingCurrentSaunoja", "true");
@@ -354,7 +361,7 @@ public class SaunojaService {
         addBlockedByProfilePageAuthor(model, username);
 
         addProfileAuthorToModel(model, username);
-        
+
         addIsFollowingCurrentSaunojaToModel(model, username);
     }
 
@@ -512,7 +519,6 @@ public class SaunojaService {
         }
 
         return returnString;
-
     }
 
     public Boolean hasErrorsOnPasswordUpdate(NewPassword newPassword, BindingResult bindingResult) {
@@ -553,19 +559,21 @@ public class SaunojaService {
 
                 roles.add("USER");
 
-                saunojaRepository.save(new Saunoja("landepaukku", passwordEncoder.encode("!Sauna5"), "Antti", "Isotalo", roles, LocalDateTime.now(), 1L, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                saunojaRepository.save(new Saunoja("landepaukku", passwordEncoder.encode("!Sauna5"), "Antti", "Isotalo", roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
-                saunojaRepository.save(new Saunoja("voikukka", passwordEncoder.encode("!Sauna5"), "Anniina", "Isotalo", roles, LocalDateTime.now(), 1L, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                saunojaRepository.save(new Saunoja("voikukka", passwordEncoder.encode("!Sauna5"), "Anniina", "Isotalo", roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
                 roles.add("ADMIN");
 
-                saunojaRepository.save(new Saunoja("Saunatonttu", passwordEncoder.encode("!Sauna5"), "Sauna", "Tonttu", roles, LocalDateTime.now(), 1L, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                saunojaRepository.save(new Saunoja("Saunatonttu", passwordEncoder.encode("!Sauna5"), "Sauna", "Tonttu", roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
+                /*
                 photoService.addDefaultPhoto(getByUsername("landepaukku"));
 
                 photoService.addDefaultPhoto(getByUsername("voikukka"));
 
                 photoService.addDefaultPhoto(getByUsername("Saunatonttu"));
+                 */
             }
         }
     }
@@ -580,10 +588,9 @@ public class SaunojaService {
 
         roles.add("GOD");
 
-        saunojaRepository.save(new Saunoja("Väinämöinen", passwordEncoder.encode("!Sauna5"), "Ariel", "Mörtengren", roles, LocalDateTime.now(), 1L, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+        saunojaRepository.save(new Saunoja("Väinämöinen", passwordEncoder.encode("!Sauna5"), "Ariel", "Mörtengren", roles, LocalDateTime.now(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
-        photoService.addDefaultPhoto(getByUsername("Väinämöinen"));
-
+        //photoService.addDefaultPhoto(getByUsername("Väinämöinen"));
     }
 
     public void logout(HttpServletRequest request) {

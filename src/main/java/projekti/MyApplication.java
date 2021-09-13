@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class MyApplication {
-    
+
     @PostConstruct
     public void started() {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Helsinki"));

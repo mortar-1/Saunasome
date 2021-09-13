@@ -111,7 +111,8 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-auto">
-                        <img th:src="@{'/photo/' + ${currentSaunoja.profilepictureId}}" alt="Avatar" class="w3-circle" style="width:40px; height:40px" onclick="openOrCloseSidebar()" />
+                        <img th:unless="${currentSaunoja.profilePictureId == null}" th:src="@{'/photo/' + ${currentSaunoja.profilePictureId}}" alt="profiilikuva" class="w3-circle" style="width:40px; height:40px" onclick="openOrCloseSidebar()" />
+                        <img th:if="${currentSaunoja.profilePictureId == null}" th:src="@{/defaultPicture.png}" alt="profiilikuva" class="w3-circle" style="width:40px; height:40px" onclick="openOrCloseSidebar()" />
                     </div>
                     <div class="col-sm-auto">
                         <h5 th:text="${currentSaunoja.username}" style="font-family: 'Harrington'; color: green; font-size: 20px">Saunojan käyttäjätunnus</h5>

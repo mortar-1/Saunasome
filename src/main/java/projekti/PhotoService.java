@@ -1,19 +1,15 @@
 package projekti;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import javax.imageio.ImageIO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class PhotoService {
@@ -29,6 +25,9 @@ public class PhotoService {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private MessageRepository messageRespository;
 
     public void addAttributesToModelForPagePhoto(Model model, Long id) {
 
@@ -66,9 +65,9 @@ public class PhotoService {
 
         photo.setIsProfilePicture(true);
 
-        author.setProfilepictureId(id);
+        author.setProfilePictureId(id);
 
-        saunojaService.setProfilepictureId(author, id);
+        saunojaService.setProfilePictureId(author, id);
 
         photoRepository.save(photo);
     }
@@ -78,17 +77,20 @@ public class PhotoService {
         return photoRepository.findByAuthor(author).size() == 10;
     }
 
-    @PreAuthorize("hasAuthority('USER') and !hasAuthority('FROZEN')")
+    @Async
+    @PreAuthorize("!hasAuthority('FROZEN')")
     public void addNewPhoto(Saunoja author, byte[] content, String description, boolean isProfilepicture, boolean isFirstPhoto) throws IOException {
 
+        
         if (!hasTenPictures(author)) {
             
+
             Photo photo = createNewPhoto(author, content);
 
             photo.setDescription(description);
 
             if (isProfilepicture && !photoRepository.findByAuthor(author).isEmpty()) {
-
+                
                 for (Photo current : photoRepository.findByAuthor(author)) {
 
                     current.setIsProfilePicture(false);
@@ -96,17 +98,17 @@ public class PhotoService {
             }
 
             photo.setIsProfilePicture(isProfilepicture);
-            
+          
             photoRepository.save(photo);
-           
+            
             if (saunojaService.getCurrentAuthentication() != null && !isFirstPhoto) {
 
                 messageService.newPhotoMessage(photo);
             }
 
             if (isProfilepicture) {
-
-                saunojaService.setProfilepictureId(author, photo.getId());
+               
+                saunojaService.setProfilePictureId(author, photo.getId());
             }
         }
     }
@@ -138,33 +140,15 @@ public class PhotoService {
         return bindingResult.hasErrors();
     }
 
-    public void addFirstPhoto(MultipartFile photo, Saunoja author) throws IOException {
-
-        if (photo.isEmpty()) {
-                        
-            addDefaultPhoto(author);
-        } else {
-
-            addNewPhoto(author, photo.getBytes(), "", true, true);
-        }
-    }
-
-    public void addDefaultPhoto(Saunoja author) throws IOException {
-        
-        File defaultPhoto = new File("photos/defaultPicture.png");
-
-        BufferedImage image = ImageIO.read(defaultPhoto);
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        ImageIO.write(image, "jpg", bos);
-        
-        addNewPhoto(author, bos.toByteArray(), "", true, true);
-    }
-
     public void addProfilePictureToModel(Model model, String Saunoja) {
 
-        model.addAttribute("profilePicture", photoRepository.findByAuthorAndIsProfilePicture(saunojaService.getByUsername(Saunoja), true));
+        if (photoRepository.findByAuthorAndIsProfilePicture(saunojaService.getByUsername(Saunoja), true) == null) {
+
+            model.addAttribute("profilePicture", "null");
+        } else {
+
+            model.addAttribute("profilePicture", photoRepository.findByAuthorAndIsProfilePicture(saunojaService.getByUsername(Saunoja), true));
+        }
     }
 
     public void addPhotosToModel(Model model, String Saunoja) {
@@ -240,13 +224,13 @@ public class PhotoService {
     }
 
     public Photo createNewPhoto(Saunoja author, byte[] content) {
-        
+
         Photo newPhoto = new Photo();
 
         newPhoto.setContent(content);
-        
+
         newPhoto.setAuthor(author);
-        
+
         newPhoto.setDescription("");
 
         newPhoto.setLikes(new ArrayList<>());
@@ -258,15 +242,17 @@ public class PhotoService {
 
     @PreAuthorize("#usernameAuthor == authentication.principal.username or hasAuthority('ADMIN')")
     public String deletePhoto(Long id, String usernameAuthor) throws IOException {
+        
+        Message newPhotoMessage = messageRespository.findByPhotoId(id);
+
+        if (newPhotoMessage != null) {
+            
+            messageRespository.delete(newPhotoMessage);
+        }
 
         Photo photo = photoRepository.getOne(id);
 
         Saunoja author = photo.getAuthor();
-
-        if (photoRepository.findByAuthor(photo.getAuthor()).size() == 1) {
-
-            addDefaultPhoto(photo.getAuthor());
-        }
 
         if (photo.getIsProfilePicture() && photoRepository.findByAuthor(photo.getAuthor()).size() > 1) {
 
@@ -274,17 +260,22 @@ public class PhotoService {
 
                 photoRepository.findByAuthor(author).get(1).setIsProfilePicture(true);
 
-                saunojaService.setProfilepictureId(author, photoRepository.findByAuthor(author).get(1).getId());
+                saunojaService.setProfilePictureId(author, photoRepository.findByAuthor(author).get(1).getId());
             } else {
 
                 photoRepository.findByAuthor(author).get(0).setIsProfilePicture(true);
 
-                saunojaService.setProfilepictureId(author, photoRepository.findByAuthor(author).get(1).getId());
+                saunojaService.setProfilePictureId(author, photoRepository.findByAuthor(author).get(1).getId());
             }
         }
 
         photoRepository.delete(photo);
-        
+
+        if (photoRepository.findByAuthor(photo.getAuthor()).isEmpty()) {
+
+            saunojaService.setProfilePictureId(author, null);
+        }
+
         return "redirect:/saunojat/" + URLEncoder.encode(author.getUsername(), "UTF-8");
     }
 

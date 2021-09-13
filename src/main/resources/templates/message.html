@@ -27,7 +27,8 @@
 
             <div class="w3-container w3-card w3-white w3-round w3-section">
                 <br/>
-                <a th:href="@{'/saunojat/' + ${message.author.username}}"><img th:src="@{'/photo/' + ${message.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
+                <a th:unless="${message.author.profilePictureId == null}" th:href="@{'/saunojat/' + ${message.author.username}}"><img th:src="@{'/photo/' + ${message.author.profilePictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
+                <a th:if="${message.author.profilePictureId == null}" th:href="@{'/saunojat/' + ${message.author.username}}"><img th:src="@{/defaultPicture.png}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
                 <span class="w3-right w3-opacity" th:unless="${message.created.toLocalDate().equals(#temporals.createToday())}" th:text="${#temporals.format(message.created, 'HH:mm d.M.yy')}">Viestin ajankohta</span>
                 <span class="w3-right w3-opacity" th:if="${message.created.toLocalDate().equals(#temporals.createToday())}" th:text="${' tänään ' + #temporals.format(message.created, 'HH:mm')}">Viestin ajankohta</span>
                 <h4 th:text="${message.author.username}" Style="font-family: 'Harrington'; color: green; font-size: 22px">Löylytunnus</h4>
@@ -108,7 +109,8 @@
             <div th:each="comment : ${comments}">
                 <div class="w3-container w3-card w3-white w3-round w3-margin">
                     <br/>
-                    <a th:href="@{'/saunojat/' + ${comment.author.username}}"><img th:src="@{'/photo/' + ${comment.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
+                    <a th:unless="${comment.author.profilePictureId == null}" th:href="@{'/saunojat/' + ${comment.author.username}}"><img th:src="@{'/photo/' + ${comment.author.profilePictureId}}" alt="Profiilikuva" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
+                    <a th:if="${comment.author.profilePictureId == null}" th:href="@{'/saunojat/' + ${comment.author.username}}"><img th:src="@{/defaultPicture.png}" alt="Profiilikuva" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
                     <span class="w3-right w3-opacity" th:unless="${comment.created.toLocalDate().equals(#temporals.createToday())}" th:text="${#temporals.format(comment.created, 'd.M.yy HH:mm')}">Kommentin ajankohta</span>
                     <span class="w3-right w3-opacity" th:if="${comment.created.toLocalDate().equals(#temporals.createToday())}" th:text="${' tänään ' + #temporals.format(comment.created, 'HH:mm')}">Kommentin ajankohta</span>
                     <h4 th:text="${comment.author.username}" Style="font-family: 'Harrington'; color: green; font-size: 22px">Löylytunnus</h4>

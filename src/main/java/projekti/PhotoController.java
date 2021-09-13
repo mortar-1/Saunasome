@@ -77,7 +77,7 @@ public class PhotoController {
 
         String encodedUsername = URLEncoder.encode(username, "UTF-8");
 
-        return "redirect:/saunojat/" + encodedUsername;
+        return "redirect:/saunojat/" + encodedUsername + "?newPhotoAdded=true";
     }
 
     @PostMapping("/photo/{id}/delete")

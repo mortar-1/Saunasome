@@ -30,7 +30,7 @@ public class SaunojaController {
 
     @Autowired
     private AccountFreezeService accountFreezeService;
-
+   
     private List<Saunoja> saunojat = new ArrayList<>();
 
     @GetMapping("/main")
@@ -66,7 +66,7 @@ public class SaunojaController {
         }
 
         saunojaService.createNewAccount(newSaunoja);
-
+        
         return "redirect:/main?created=true";
     }
 

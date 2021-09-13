@@ -23,7 +23,8 @@
 
                 <!-- USERNAME AND PROFILEPICTURE -->
 
-                <a th:href="@{'/saunojat/' + ${photo.author.username}}"><img th:src="@{'/photo/' + ${photo.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>            
+                <a th:unless="${photo.author.profilePictureId == null}" th:href="@{'/saunojat/' + ${photo.author.username}}"><img th:src="@{'/photo/' + ${photo.author.profilePictureId}}" alt="Löylytunnus" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
+                <a th:if="${photo.author.profilePictureId == null}" th:href="@{'/saunojat/' + ${photo.author.username}}"><img th:src="@{/defaultPicture.png}" alt="Löylytunnus" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
                 <h4 th:text="${photo.author.username}" style="font-family: 'Harrington'; color: green; font-size: 22px">Löylytunnus</h4>
 
                 <hr class="w3-clear"/>
@@ -46,7 +47,7 @@
 
                 <!-- SET AS PROFILEPICTURE -->
 
-                <button th:if="${photo.author.username == currentSaunoja.username and !photo.isProfilePicture}" type="button" class="w3-button center" onclick="document.getElementById('setAsProfilePicture').click()"><i class="material-icons" style="font-size: 20px">perm_identity</i> Aseta profiilikuvaksi </button>
+                <button th:if="${photo.author.username == currentSaunoja.username and !photo.isProfilePicture}" type="button" class="w3-button center" style="font-family: 'Harrington'; color: green; font-size: 20px" onclick="document.getElementById('setAsProfilePicture').click()" ><i class="material-icons" style="font-size: 20px">perm_identity</i> Aseta profiilikuvaksi </button>
 
                 <!-- PHOTO -->
                 
@@ -139,7 +140,7 @@
             <div th:each="comment : ${comments}">
                 <div class="w3-container w3-card w3-white w3-round w3-margin">
                     <br/>
-                    <a th:href="@{'/saunojat/' + ${comment.author.username}}"><img th:src="@{'/photo/' + ${comment.author.profilepictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
+                    <a th:href="@{'/saunojat/' + ${comment.author.username}}"><img th:src="@{'/photo/' + ${comment.author.profilePictureId}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
                     <span class="w3-right w3-opacity" th:unless="${comment.created.toLocalDate().equals(#temporals.createToday())}" th:text="${#temporals.format(comment.created, 'd.M.yy HH:mm')}">Kommentin ajankohta</span>
                     <span class="w3-right w3-opacity" th:if="${comment.created.toLocalDate().equals(#temporals.createToday())}" th:text="${' tänään ' + #temporals.format(comment.created, 'HH:mm')}">Kommentin ajankohta</span>
                     <h4 th:text="${comment.author.username}" Style="font-family: 'Harrington'; color: green; font-size: 22px">Löylytunnus</h4>

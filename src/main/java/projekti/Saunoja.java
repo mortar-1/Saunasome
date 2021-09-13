@@ -38,7 +38,7 @@ public class Saunoja extends AbstractPersistable<Long> implements Comparable<Sau
 
     private LocalDateTime created;
 
-    private Long profilepictureId;
+    private Long profilePictureId;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
     @OnDelete(action = OnDeleteAction.CASCADE)

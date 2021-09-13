@@ -8,4 +8,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     List<Message> findByAuthorIn(List<Saunoja> saunojat, Pageable pageable);
 
+    Message findByPhotoId(Long id);
+    
 }
