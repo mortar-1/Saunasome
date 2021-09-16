@@ -17,35 +17,22 @@ import org.springframework.validation.BindingResult;
 public class MessageService {
 
     @Autowired
-    private MessageRepository messageRepository;
+    private CommentService commentService;
 
     @Autowired
     private FollowRepository followRepository;
+    
+    @Autowired
+    private MessageRepository messageRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private SaunojaService saunojaService;
-    
-    @Autowired
-    private CommentService commentService;
-    
-    @Autowired
-    private NotificationService notificationService;
-        
-    public void addAttributesToModelForPageWall(Model model) {
-        
-        addMessagesToModel(model, saunojaService.getCurrentSaunoja());
 
-        addWelcomeMessageToModel(model);
-
-        saunojaService.addCurrentSaunojaToModel(model);
-
-        saunojaService.addFollowingFollowedByBlockedToModel(model);
-        
-        notificationService.addNotificationsForCurrentSaunojaToModel(model);
-    }
-    
     public void addAttributesToModelForPageMessage(Model model, Long id) {
-                
+
         addPresentNextPreviousToModel(model, id);
 
         saunojaService.addCurrentSaunojaToModel(model);
@@ -53,80 +40,21 @@ public class MessageService {
         saunojaService.addFollowingFollowedByBlockedToModel(model);
 
         model.addAttribute("comments", commentService.getLast10MessageComments(id));
-        
+
         saunojaService.addBlockedByProfilePageAuthor(model, messageRepository.getOne(id).getAuthor().getUsername());
     }
 
-    public Boolean messageNotFound(Long id) {
+    public void addAttributesToModelForPageWall(Model model) {
 
-        return !messageRepository.existsById(id);
-    }
+        addMessagesToModel(model, saunojaService.getCurrentSaunoja());
 
-    @PreAuthorize("hasAuthority('USER') and !hasAuthority('FROZEN')")
-    public void postNew(String newMessageContent) {
+        addWelcomeMessageToModel(model);
 
-        Message message = newEmptyMessage();
+        saunojaService.addCurrentSaunojaToModel(model);
 
-        message.setContent(newMessageContent);
+        saunojaService.addFollowingFollowedByBlockedToModel(model);
 
-        messageRepository.save(message);
-    }
-    
-    public Boolean hasErrorsInNewMessage(NewMessage newMessage, BindingResult bindingResult) {
-
-        if (newMessage.getContent() != null && newMessage.getContent().length() >= 2000) {
-
-            bindingResult.rejectValue("content", "error.message", "Viesti on liian pitkä.");
-        }
-
-        if (newMessage.getContent() == null || newMessage.getContent().isBlank()) {
-
-            bindingResult.rejectValue("content", "error.message", "Viesti ei saa olla tyhjä.");
-        }
-        
-        return bindingResult.hasErrors();
-    }
-
-    public void newPhotoMessage(Photo photo) {
-
-        Message message = newEmptyMessage();
-        
-        message.setAuthor(photo.getAuthor());
-
-        message.setIsNewPhotoMessage(Boolean.TRUE);
-
-        message.setContent("lisäsi uuden kuvan.");
-
-        message.setPhotoId(photo.getId());
-
-        messageRepository.save(message);
-    }
-
-    public Message newEmptyMessage() {
-
-        Message message = new Message();
-
-        message.setAuthor(saunojaService.getCurrentSaunoja());
-
-        message.setCreated(LocalDateTime.now());
-
-        message.setLikes(new ArrayList<>());
-
-        message.setIsNewPhotoMessage(Boolean.FALSE);
-
-        return message;
-    }
-
-    public void addWelcomeMessageToModel(Model model) {
-
-        Message message = newEmptyMessage();
-
-        message.setAuthor(saunojaService.getByUsername("Väinämöinen"));
-
-        message.setContent("Tervetuloa leppoisaan seuraamme " + saunojaService.getCurrentUsername()
-                + "! Istut nyt lauteilla. Täällä kuulet kaikki vitsit ja tarinat niiltä saunojilta, joita sinä päätät kuunnella. Klikkaamalla omaa profiilikuvaasi sivun ylälaidassa, saat näkyviin ne saunojat joita sinä kuuntelet ja jotka kuuntelevat sinua. Antoisia löylyjä!");
-
-        model.addAttribute("welcomeMessage", message);
+        notificationService.addNotificationsForCurrentSaunojaToModel(model);
     }
 
     public void addMessagesToModel(Model model, Saunoja saunoja) {
@@ -138,29 +66,6 @@ public class MessageService {
 
             model.addAttribute("messages", get25Messages(saunoja));
         }
-    }
-
-    public void like(Long id, String action) {
-
-        Message message = messageRepository.getOne(id);
-
-        if (action.equals("like")) {
-
-            if (!message.getLikes().contains(saunojaService.getCurrentUsername())) {
-
-                message.getLikes().add(saunojaService.getCurrentUsername());
-            }
-        }
-
-        if (action.equals("unlike")) {
-
-            if (message.getLikes().contains(saunojaService.getCurrentUsername())) {
-
-                message.getLikes().remove(saunojaService.getCurrentUsername());
-            }
-        }
-
-        messageRepository.save(message);
     }
 
     public void addPresentNextPreviousToModel(Model model, Long id) {
@@ -201,6 +106,31 @@ public class MessageService {
         }
     }
 
+    public void addWelcomeMessageToModel(Model model) {
+
+        Message message = newEmptyMessage();
+
+        message.setAuthor(saunojaService.getByUsername("Väinämöinen"));
+
+        message.setContent("Tervetuloa leppoisaan seuraamme " + saunojaService.getCurrentUsername()
+                + "! Istut nyt lauteilla. Täällä kuulet kaikki vitsit ja tarinat niiltä saunojilta, joita sinä päätät kuunnella. Klikkaamalla omaa profiilikuvaasi sivun ylälaidassa, saat näkyviin ne saunojat joita sinä kuuntelet ja jotka kuuntelevat sinua. Antoisia löylyjä!");
+
+        model.addAttribute("welcomeMessage", message);
+    }
+
+    @PreAuthorize("#usernameAuthor == authentication.principal.username or hasAuthority('ADMIN')")
+    public void deleteMessage(Long id, String usernameAuthor) {
+
+        messageRepository.deleteById(id);
+    }
+
+    public List<Message> get100MessagesForAdmin() {
+
+        Pageable pageable = PageRequest.of(0, 100, Sort.by("created").descending());
+
+        return (List<Message>) messageRepository.findAll(pageable).getContent();
+    }
+
     public List<Message> get25Messages(Saunoja saunoja) {
 
         Pageable pageable = PageRequest.of(0, 25, Sort.by("created").descending());
@@ -216,13 +146,6 @@ public class MessageService {
         return messageRepository.findByAuthorIn(saunojat, pageable);
     }
 
-    public List<Message> get100MessagesForAdmin() {
-
-        Pageable pageable = PageRequest.of(0, 100, Sort.by("created").descending());
-
-        return (List<Message>) messageRepository.findAll(pageable).getContent();
-    }
-
     public List<Message> getNext50MessagesForAdmin(int current) {
 
         Pageable pageable = PageRequest.of(current, current + 50, Sort.by("created").descending());
@@ -230,10 +153,87 @@ public class MessageService {
         return (List<Message>) messageRepository.findAll(pageable);
     }
 
-    @PreAuthorize("#usernameAuthor == authentication.principal.username or hasAuthority('ADMIN')")
-    public void deleteMessage(Long id, String usernameAuthor) {
+    public Boolean hasErrorsInNewMessage(NewMessage newMessage, BindingResult bindingResult) {
 
-        messageRepository.deleteById(id);
+        if (newMessage.getContent() != null && newMessage.getContent().length() >= 2000) {
+
+            bindingResult.rejectValue("content", "error.message", "Viesti on liian pitkä.");
+        }
+
+        if (newMessage.getContent() == null || newMessage.getContent().isBlank()) {
+
+            bindingResult.rejectValue("content", "error.message", "Viesti ei saa olla tyhjä.");
+        }
+
+        return bindingResult.hasErrors();
+    }
+
+    public void like(Long id, String action) {
+
+        Message message = messageRepository.getOne(id);
+
+        if (action.equals("like")) {
+
+            if (!message.getLikes().contains(saunojaService.getCurrentUsername())) {
+
+                message.getLikes().add(saunojaService.getCurrentUsername());
+            }
+        }
+
+        if (action.equals("unlike")) {
+
+            if (message.getLikes().contains(saunojaService.getCurrentUsername())) {
+
+                message.getLikes().remove(saunojaService.getCurrentUsername());
+            }
+        }
+
+        messageRepository.save(message);
+    }
+
+    public Boolean messageNotFound(Long id) {
+
+        return !messageRepository.existsById(id);
+    }
+
+    public Message newEmptyMessage() {
+
+        Message message = new Message();
+
+        message.setAuthor(saunojaService.getCurrentSaunoja());
+
+        message.setCreated(LocalDateTime.now());
+
+        message.setLikes(new ArrayList<>());
+
+        message.setIsNewPhotoMessage(Boolean.FALSE);
+
+        return message;
+    }
+
+    public void newPhotoMessage(Photo photo) {
+
+        Message message = newEmptyMessage();
+
+        message.setAuthor(photo.getAuthor());
+
+        message.setIsNewPhotoMessage(Boolean.TRUE);
+
+        message.setContent("lisäsi uuden kuvan.");
+
+        message.setPhotoId(photo.getId());
+
+        messageRepository.save(message);
+    }
+
+    @PreAuthorize("hasAuthority('USER') and !hasAuthority('FROZEN')")
+    public void postNew(String newMessageContent) {
+
+        Message message = newEmptyMessage();
+
+        message.setContent(newMessageContent);
+
+        messageRepository.save(message);
     }
 
 }

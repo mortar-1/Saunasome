@@ -26,37 +26,14 @@ public class NotificationService {
         saunojaService.addFollowingFollowedByBlockedToModel(model);
     }
 
-    public void newNotification(String username, NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze) {
+    public void addNotificationsForAdminToModel(Model model) {
 
-        Notification notification = new Notification();
-
-        notification.setAuthor(saunojaService.getCurrentSaunoja());
-
-        notification.setRecipient(saunojaService.getByUsername(username));
-
-        notification.setContent(newNotiflicationOrAccountFreeze.getContent());
-
-        notification.setCreated(LocalDateTime.now());
-        
-        notification.setIsAlert(newNotiflicationOrAccountFreeze.getIsAlert());
-
-        notificationRepository.save(notification);
-
+        model.addAttribute("notifications", getNotificationsForAdmin());
     }
 
-    public Boolean hasErrorsInNewNotification(NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze, BindingResult bindingResult) {
+    public void addNotificationsForCurrentSaunojaToModel(Model model) {
 
-        if (newNotiflicationOrAccountFreeze.getContent() != null && newNotiflicationOrAccountFreeze.getContent().length() >= 200) {
-
-            bindingResult.rejectValue("content", "error.newNotification", "Ilmoitus on liian pitkä.");
-        }
-
-        if (newNotiflicationOrAccountFreeze.getContent() == null || newNotiflicationOrAccountFreeze.getContent().isBlank()) {
-
-            bindingResult.rejectValue("content", "error.newNotification", "Ilmoitus ei saa olla tyhjä.");
-        }
-
-        return bindingResult.hasErrors();
+        model.addAttribute("notifications", getNotificationsForCurrentSaunoja());
     }
 
     @PreAuthorize("#usernameAuthor == authentication.principal.username or hasAuthority('ADMIN')")
@@ -79,6 +56,11 @@ public class NotificationService {
         return "redirect:/wall";
     }
 
+    public List<Notification> getNotificationsForAdmin() {
+
+        return notificationRepository.findAll();
+    }
+
     public List<Notification> getNotificationsForCurrentSaunoja() {
 
         Saunoja saunoja = saunojaService.getCurrentSaunoja();
@@ -86,19 +68,36 @@ public class NotificationService {
         return notificationRepository.findByRecipientOrderByCreated(saunoja);
     }
 
-    public List<Notification> getNotificationsForAdmin() {
+    public Boolean hasErrorsInNewNotification(NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze, BindingResult bindingResult) {
 
-        return notificationRepository.findAll();
+        if (newNotiflicationOrAccountFreeze.getContent() != null && newNotiflicationOrAccountFreeze.getContent().length() >= 200) {
+
+            bindingResult.rejectValue("content", "error.newNotification", "Ilmoitus on liian pitkä.");
+        }
+
+        if (newNotiflicationOrAccountFreeze.getContent() == null || newNotiflicationOrAccountFreeze.getContent().isBlank()) {
+
+            bindingResult.rejectValue("content", "error.newNotification", "Ilmoitus ei saa olla tyhjä.");
+        }
+
+        return bindingResult.hasErrors();
     }
 
-    public void addNotificationsForCurrentSaunojaToModel(Model model) {
+    public void newNotification(String username, NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze) {
 
-        model.addAttribute("notifications", getNotificationsForCurrentSaunoja());
-    }
+        Notification notification = new Notification();
 
-    public void addNotificationsForAdminToModel(Model model) {
+        notification.setAuthor(saunojaService.getCurrentSaunoja());
 
-        model.addAttribute("notifications", getNotificationsForAdmin());
+        notification.setRecipient(saunojaService.getByUsername(username));
+
+        notification.setContent(newNotiflicationOrAccountFreeze.getContent());
+
+        notification.setCreated(LocalDateTime.now());
+
+        notification.setIsAlert(newNotiflicationOrAccountFreeze.getIsAlert());
+
+        notificationRepository.save(notification);
     }
 
 }

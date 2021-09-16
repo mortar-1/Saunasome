@@ -45,20 +45,11 @@ public class CommentService {
 
         commentRepository.save(comment);
     }
-    
-    public Boolean hasErrorsInNewComment(BindingResult bindingResult, NewComment newComment) {
-        
-        if (newComment.getContent() != null && newComment.getContent().length() >= 2000) {
 
-            bindingResult.rejectValue("content", "error.message", "Kommentti on liian pitkä.");
-        }
+    @PreAuthorize("#usernameAuthor == authentication.principal.username or hasAuthority('ADMIN')")
+    public void delete(Long id, String usernameAuthor) {
 
-        if (newComment.getContent() == null || newComment.getContent().isBlank()) {
-
-            bindingResult.rejectValue("content", "error.message", "Kommentti ei saa olla tyhjä.");
-        }
-        
-        return bindingResult.hasErrors();
+        commentRepository.deleteById(id);
     }
 
     public List<Comment> getLast10MessageComments(Long id) {
@@ -75,21 +66,21 @@ public class CommentService {
         return commentRepository.findByPhotoId(id, pageable);
     }
 
-    public Comment newCommentWithTimeAuthorContentSet(String content) {
+    public Boolean hasErrorsInNewComment(BindingResult bindingResult, NewComment newComment) {
 
-        Comment comment = new Comment();
+        if (newComment.getContent() != null && newComment.getContent().length() >= 2000) {
 
-        comment.setCreated(LocalDateTime.now());
+            bindingResult.rejectValue("content", "error.message", "Kommentti on liian pitkä.");
+        }
 
-        comment.setAuthor(saunojaService.getCurrentSaunoja());
+        if (newComment.getContent() == null || newComment.getContent().isBlank()) {
 
-        comment.setContent(content);
-        
-        comment.setLikes(new ArrayList<String>());
+            bindingResult.rejectValue("content", "error.message", "Kommentti ei saa olla tyhjä.");
+        }
 
-        return comment;
+        return bindingResult.hasErrors();
     }
-    
+
     public void like(Long id, String action) {
 
         Comment comment = commentRepository.getOne(id);
@@ -113,10 +104,19 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    @PreAuthorize("#usernameAuthor == authentication.principal.username or hasAuthority('ADMIN')")
-    public void delete(Long id, String usernameAuthor) {
+    public Comment newCommentWithTimeAuthorContentSet(String content) {
 
-        commentRepository.deleteById(id);
+        Comment comment = new Comment();
+
+        comment.setCreated(LocalDateTime.now());
+
+        comment.setAuthor(saunojaService.getCurrentSaunoja());
+
+        comment.setContent(content);
+
+        comment.setLikes(new ArrayList<String>());
+
+        return comment;
     }
 
 }

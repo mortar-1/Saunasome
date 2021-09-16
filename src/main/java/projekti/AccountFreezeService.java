@@ -14,22 +14,47 @@ class AccountFreezeService {
 
     @Autowired
     private AccountFreezeRepository accountFreezeRepository;
+    
+    @Autowired
+    private SaunojaRepository saunojaRepository;
 
     @Autowired
     private SaunojaService saunojaService;
 
+    public void checkIfFrozen(Model model) {
+
+        Saunoja saunoja = saunojaService.getCurrentSaunoja();
+
+        if (saunoja.getRoles().contains("FROZEN")) {
+
+            AccountFreeze accountFreeze = accountFreezeRepository.findByRecipient(saunoja);
+
+            model.addAttribute("accountFreeze", accountFreeze);
+
+            if (accountFreeze != null && accountFreeze.getExpires() == null) {
+
+                return;
+            }
+
+            if (accountFreeze != null && accountFreeze.getExpires().isBefore(LocalDateTime.now())) {
+
+                unFreezeAccount(saunoja.getUsername());
+            }
+        }
+    }
+
     @PreAuthorize("hasAuthority('GOD')")
     public void freezeAccount(String username, NewNotiflicationOrAccountFreeze newNotiflicationOrAccountFreeze) {
-        
+
         if (Pattern.matches("[1-9]+", newNotiflicationOrAccountFreeze.getTimeToExpiration())) {
-            
+
             return;
         }
-        
+
         Integer timeToExpiration = Integer.valueOf(newNotiflicationOrAccountFreeze.getTimeToExpiration());
-        
+
         String timeUnit = newNotiflicationOrAccountFreeze.getTimeUnit();
-                
+
         AccountFreeze accountFreeze = new AccountFreeze();
 
         accountFreeze.setAuthor(saunojaService.getCurrentSaunoja());
@@ -72,13 +97,22 @@ class AccountFreezeService {
 
             bindingResult.rejectValue("timeToExpiration", "error.newAccountFreeze", "Täsmennä luvulla avannossaolo aika.");
         }
-        
+
         if (!Pattern.matches("[0-9]+", newNotiflicationOrAccountFreeze.getTimeToExpiration())) {
-            
+
             bindingResult.rejectValue("timeToExpiration", "error.newAccountFreeze", "Syötä vain numeroita.");
         }
 
         return bindingResult.hasErrors();
+    }
+    
+    public void removeFreezeFromRoles(String username) {
+
+        Saunoja saunoja = saunojaService.getByUsername(username);
+
+        saunoja.getRoles().remove("FROZEN");
+
+        saunojaRepository.save(saunoja);
     }
 
     @Transactional
@@ -86,29 +120,6 @@ class AccountFreezeService {
 
         accountFreezeRepository.deleteByRecipient(saunojaService.getByUsername(username));
 
-        saunojaService.removeFreezeFromRoles(username);
+        removeFreezeFromRoles(username);
     }
-
-    public void checkIfFrozen(Model model) {    
-
-        Saunoja saunoja = saunojaService.getCurrentSaunoja();
-
-        if (saunoja.getRoles().contains("FROZEN")) {
-
-            AccountFreeze accountFreeze = accountFreezeRepository.findByRecipient(saunoja);
-
-            model.addAttribute("accountFreeze", accountFreeze);
-
-            if (accountFreeze != null && accountFreeze.getExpires() == null) {
-
-                return;
-            }
-
-            if (accountFreeze != null && accountFreeze.getExpires().isBefore(LocalDateTime.now())) {
-
-                unFreezeAccount(saunoja.getUsername());
-            }
-        }
-    }
-
 }

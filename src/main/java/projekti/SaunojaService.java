@@ -26,62 +26,46 @@ import org.springframework.web.multipart.MultipartFile;
 public class SaunojaService {
 
     @Autowired
-    Environment environment;
-
-    @Autowired
-    private SaunojaRepository saunojaRepository;
-
-    @Autowired
-    private PhotoService photoService;
-
-    @Autowired
-    private FollowRepository followRespository;
-
-    @Autowired
     private BlockRepository blockRepository;
-
-    @Autowired
-    private NotificationService notificationService;
 
     @Autowired
     private DeletedSaunojaRepository deletedSaunojaRepository;
 
     @Autowired
+    private Environment environment;
+
+    @Autowired
+    private FollowRepository followRespository;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public Saunoja getByUsername(String username) {
+    @Autowired
+    private PhotoService photoService;
 
-        return saunojaRepository.findByUsername(username);
-    }
+    @Autowired
+    private SaunojaRepository saunojaRepository;
 
-    public Saunoja getByAuthentication(Authentication auth) {
+    public void addAttributesToModelForPageSaunoja(Model model, String username) {
 
-        return saunojaRepository.findByUsername(auth.getName());
-    }
+        photoService.addProfilePictureToModel(model, username);
 
-    public Authentication getCurrentAuthentication() {
+        photoService.addPhotosToModel(model, username);
 
-        return SecurityContextHolder.getContext().getAuthentication();
-    }
+        addIsFollowingAndIsBlockingToModel(model, username);
 
-    public String getCurrentUsername() {
+        addCurrentSaunojaToModel(model);
 
-        return getCurrentAuthentication().getName();
-    }
+        addFollowingFollowedByBlockedToModel(model);
 
-    public Saunoja getCurrentSaunoja() {
+        addBlockedByProfilePageAuthor(model, username);
 
-        return saunojaRepository.findByUsername(getCurrentUsername());
-    }
+        addProfileAuthorToModel(model, username);
 
-    public void addCurrentSaunojaToModel(Model model) {
-
-        model.addAttribute("currentSaunoja", getCurrentSaunoja());
-    }
-
-    public void addProfileAuthorToModel(Model model, String username) {
-
-        model.addAttribute("saunoja", saunojaRepository.findByUsername(username));
+        addIsFollowingCurrentSaunojaToModel(model, username);
     }
 
     public void addBlockedByProfilePageAuthor(Model model, String authorUsername) {
@@ -98,6 +82,11 @@ public class SaunojaService {
         Collections.sort(blockedUsernames);
 
         model.addAttribute("authorBlockedUsernames", blockedUsernames);
+    }
+
+    public void addCurrentSaunojaToModel(Model model) {
+
+        model.addAttribute("currentSaunoja", getCurrentSaunoja());
     }
 
     public void addFollowingFollowedByBlockedToModel(Model model) {
@@ -135,186 +124,6 @@ public class SaunojaService {
         model.addAttribute("blocked", blocked);
     }
 
-    public Boolean hasErrorsOnRegistration(NewSaunoja newSaunoja, BindingResult bindingResult) {
-
-        Double binarybitesToMegabitesCoefficient = 0.00000095367432;
-
-        if (!newSaunoja.getPassword().equals(newSaunoja.getConfirmPassword())) {
-
-            bindingResult.rejectValue("confirmPassword", "error.newSaunoja", "Salasanat eivät täsmää.");
-        }
-
-        if (saunojaRepository.findByUsernameIgnoreCase(newSaunoja.getUsername()) != null) {
-
-            bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus on varattu.");
-        }
-
-        if (deletedSaunojaRepository.findByUsernameIgnoreCase(newSaunoja.getUsername()) != null) {
-
-            bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnuksen käyttö on estetty.");
-        }
-
-        if (newSaunoja.getUsername().contains(" ")) {
-
-            bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus ei saa sisältää välilyöntejä.");
-        }
-
-        if (newSaunoja.getUsername().length() < 2 || newSaunoja.getUsername().length() > 20 || newSaunoja.getUsername().isBlank()) {
-
-            bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnuksen pituden tulee olla välillä 2 - 20 merkkiä.");
-        }
-
-        if (newSaunoja.getPhoto().getSize() * binarybitesToMegabitesCoefficient >= 5) {
-
-            bindingResult.rejectValue("photo", "error.newSaunoja", "Kuva on liian suuri");
-        }
-
-        return bindingResult.hasErrors();
-    }
-
-    public void addValuesFromBeforeToModel(Model model, NewSaunoja newSaunoja) {
-
-        model.addAttribute("firstNameFromBefore", newSaunoja.getFirstName());
-
-        model.addAttribute("lastNameFromBefore", newSaunoja.getLastName());
-
-        model.addAttribute("usernameFromBefore", newSaunoja.getUsername());
-    }
-
-    public void createNewAccount(NewSaunoja newSaunoja) throws IOException {
-
-        String username = newSaunoja.getUsername();
-
-        String firstName = newSaunoja.getFirstName();
-
-        String lastName = newSaunoja.getLastName();
-
-        String password = newSaunoja.getPassword();
-        
-        MultipartFile photo = newSaunoja.getPhoto();
-
-        if (saunojaRepository.findByUsernameIgnoreCase(username) != null && deletedSaunojaRepository.findByUsernameIgnoreCase(username) != null) {
-
-            return;
-        }
-
-        List<String> roles = new ArrayList<>();
-
-        roles.add("USER");
-
-        Saunoja saunoja = new Saunoja(username, passwordEncoder.encode(password), firstName, lastName, roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-
-        saunojaRepository.save(saunoja);
-        
-        System.out.println("<<<< " + photo + " >>>>");
-                        
-        if (photo != null) {
-            
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!KISSA");
-
-            photoService.addNewPhoto(getByUsername(username), photo.getBytes(), "", true, true);
-        }
-    }
-
-    public void setProfilePictureId(Saunoja saunoja, Long id) {
-
-        saunoja.setProfilePictureId(id);
-
-        saunojaRepository.save(saunoja);
-    }
-
-    public void followUnfollowBlockUnblock(String action, Saunoja subject, Saunoja object) {
-
-        if (action.equals("follow")) {
-
-            follow(subject, object);
-        }
-
-        if (action.equals("unfollow")) {
-
-            unFollow(subject, object);
-        }
-
-        if (action.equals("block")) {
-
-            block(subject, object);
-        }
-
-        if (action.equals("unblock")) {
-
-            unBlock(subject, object);
-        }
-    }
-
-    public void follow(Saunoja follower, Saunoja followed) {
-
-        if (areNotSame(follower, followed) && haveNotBlocked(followed, follower) && isNotFollowing(follower, followed)) {
-
-            if (!haveNotBlocked(follower, followed)) {
-
-                unBlock(follower, followed);
-            }
-
-            followRespository.save(new Follow(follower, followed, LocalDateTime.now()));
-        }
-    }
-
-    public void unFollow(Saunoja follower, Saunoja followed) {
-
-        if (!isNotFollowing(follower, followed)) {
-
-            followRespository.deleteByFollowerAndFollowed(follower, followed);
-        }
-    }
-
-    @PreAuthorize("!#blocked.roles.contains('ADMIN')")
-    public void block(Saunoja blocker, Saunoja blocked) {
-
-        if (haveNotBlocked(blocker, blocked)) {
-
-            unFollow(blocker, blocked);
-
-            unFollow(blocked, blocker);
-
-            blockRepository.save(new Block(blocker, blocked, LocalDateTime.now()));
-        }
-    }
-
-    public void unBlock(Saunoja blocker, Saunoja blocked) {
-
-        if (!haveNotBlocked(blocker, blocked)) {
-
-            blockRepository.deleteByBlockerAndBlocked(blocker, blocked);
-        }
-    }
-
-    public Boolean haveNotBlocked(Saunoja blocker, Saunoja blocked) {
-
-        return blockRepository.findByBlockerAndBlocked(blocker, blocked) == null;
-    }
-
-    public Boolean areNotSame(Saunoja subject, Saunoja object) {
-
-        return !subject.equals(object);
-    }
-
-    public Boolean isNotFollowing(Saunoja follower, Saunoja followed) {
-
-        return followRespository.findByFollowerAndFollowed(follower, followed) == null;
-    }
-
-    public void addIsFollowingCurrentSaunojaToModel(Model model, String authorUsername) {
-
-        Saunoja author = getByUsername(authorUsername);
-
-        if (!isNotFollowing(author, getCurrentSaunoja())) {
-
-            model.addAttribute("isFollowingCurrentSaunoja", "true");
-
-            model.addAttribute("followingCurrentSaunojaFromWhen", followingFromWhen(author, getCurrentSaunoja()));
-        }
-    }
-
     public void addIsFollowingAndIsBlockingToModel(Model model, String objectUsername) {
 
         Saunoja subject = getCurrentSaunoja();
@@ -346,49 +155,35 @@ public class SaunojaService {
         }
     }
 
-    public void addAttributesToModelForPageSaunoja(Model model, String username) {
+    public void addIsFollowingCurrentSaunojaToModel(Model model, String authorUsername) {
 
-        photoService.addProfilePictureToModel(model, username);
+        Saunoja author = getByUsername(authorUsername);
 
-        photoService.addPhotosToModel(model, username);
+        if (!isNotFollowing(author, getCurrentSaunoja())) {
 
-        addIsFollowingAndIsBlockingToModel(model, username);
+            model.addAttribute("isFollowingCurrentSaunoja", "true");
 
-        addCurrentSaunojaToModel(model);
-
-        addFollowingFollowedByBlockedToModel(model);
-
-        addBlockedByProfilePageAuthor(model, username);
-
-        addProfileAuthorToModel(model, username);
-
-        addIsFollowingCurrentSaunojaToModel(model, username);
+            model.addAttribute("followingCurrentSaunojaFromWhen", followingFromWhen(author, getCurrentSaunoja()));
+        }
     }
 
-    public LocalDateTime followingFromWhen(Saunoja follower, Saunoja followed) {
+    public void addProfileAuthorToModel(Model model, String username) {
 
-        Follow follow = followRespository.findByFollowerAndFollowed(follower, followed);
-
-        return follow.getCreated();
+        model.addAttribute("saunoja", saunojaRepository.findByUsername(username));
     }
 
-    public LocalDateTime blockingFromWhen(Saunoja blocker, Saunoja blocked) {
+    public void addValuesFromBeforeToModel(Model model, NewSaunoja newSaunoja) {
 
-        Block block = blockRepository.findByBlockerAndBlocked(blocker, blocked);
+        model.addAttribute("firstNameFromBefore", newSaunoja.getFirstName());
 
-        return block.getCreated();
+        model.addAttribute("lastNameFromBefore", newSaunoja.getLastName());
+
+        model.addAttribute("usernameFromBefore", newSaunoja.getUsername());
     }
 
-    public List<SimpleGrantedAuthority> rolesToGrantedAuthority(Saunoja saunoja) {
+    public Boolean areNotSame(Saunoja subject, Saunoja object) {
 
-        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
-
-        saunoja.getRoles().forEach((current) -> {
-
-            grantedAuthorities.add(new SimpleGrantedAuthority(current));
-        });
-
-        return grantedAuthorities;
+        return !subject.equals(object);
     }
 
     @PreAuthorize("hasAuthority('GOD')")
@@ -469,26 +264,91 @@ public class SaunojaService {
         saunojaRepository.save(saunoja);
     }
 
-    // USED IN ACCOUNTFREEZESERVICE
-    public void removeFreezeFromRoles(String username) {
+    @PreAuthorize("!#blocked.roles.contains('ADMIN')")
+    public void block(Saunoja blocker, Saunoja blocked) {
 
-        Saunoja saunoja = getByUsername(username);
+        if (haveNotBlocked(blocker, blocked)) {
 
-        saunoja.getRoles().remove("FROZEN");
+            unFollow(blocker, blocked);
 
-        saunojaRepository.save(saunoja);
+            unFollow(blocked, blocker);
+
+            blockRepository.save(new Block(blocker, blocked, LocalDateTime.now()));
+        }
     }
 
-    public Boolean hasErrorsOnAccountDeletion(newDeleteAccount newDeleteAccount, BindingResult bindingResult) {
+    public LocalDateTime blockingFromWhen(Saunoja blocker, Saunoja blocked) {
 
-        String currentPassword = getCurrentSaunoja().getPassword();
+        Block block = blockRepository.findByBlockerAndBlocked(blocker, blocked);
 
-        if (!passwordEncoder.matches(newDeleteAccount.getPassword(), currentPassword)) {
+        return block.getCreated();
+    }
 
-            bindingResult.rejectValue("password", "error.newDeleteAccount", "Salasana väärin.");
+    public void createGod() throws IOException {
+
+        List<String> roles = new ArrayList<>();
+
+        roles.add("USER");
+
+        roles.add("ADMIN");
+
+        roles.add("GOD");
+
+        saunojaRepository.save(new Saunoja("Väinämöinen", passwordEncoder.encode("!Sauna5"), "Ariel", "Mörtengren", roles, LocalDateTime.now(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+    }
+
+    public void createNewAccount(NewSaunoja newSaunoja) throws IOException {
+
+        String username = newSaunoja.getUsername();
+
+        String firstName = newSaunoja.getFirstName();
+
+        String lastName = newSaunoja.getLastName();
+
+        String password = newSaunoja.getPassword();
+
+        MultipartFile photo = newSaunoja.getPhoto();
+
+        if (saunojaRepository.findByUsernameIgnoreCase(username) != null && deletedSaunojaRepository.findByUsernameIgnoreCase(username) != null) {
+
+            return;
         }
 
-        return bindingResult.hasErrors();
+        List<String> roles = new ArrayList<>();
+
+        roles.add("USER");
+
+        Saunoja saunoja = new Saunoja(username, passwordEncoder.encode(password), firstName, lastName, roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+
+        saunojaRepository.save(saunoja);
+
+        if (photo != null) {
+
+            photoService.addNewPhoto(getByUsername(username), photo.getBytes(), "", true, true);
+        }
+    }
+
+    public void createSomeSaunojas() throws IOException {
+
+        if (saunojaRepository.findAll().isEmpty()) {
+
+            createGod();
+
+            if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
+
+                List<String> roles = new ArrayList<>();
+
+                roles.add("USER");
+
+                saunojaRepository.save(new Saunoja("landepaukku", passwordEncoder.encode("!Sauna5"), "Antti", "Isotalo", roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+
+                saunojaRepository.save(new Saunoja("voikukka", passwordEncoder.encode("!Sauna5"), "Anniina", "Isotalo", roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+
+                roles.add("ADMIN");
+
+                saunojaRepository.save(new Saunoja("Saunatonttu", passwordEncoder.encode("!Sauna5"), "Sauna", "Tonttu", roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+            }
+        }
     }
 
     @PreAuthorize("#username == authentication.principal.username or hasAuthority('GOD')")
@@ -521,6 +381,86 @@ public class SaunojaService {
         return returnString;
     }
 
+    public void follow(Saunoja follower, Saunoja followed) {
+
+        if (areNotSame(follower, followed) && haveNotBlocked(followed, follower) && isNotFollowing(follower, followed)) {
+
+            if (!haveNotBlocked(follower, followed)) {
+
+                unBlock(follower, followed);
+            }
+
+            followRespository.save(new Follow(follower, followed, LocalDateTime.now()));
+        }
+    }
+
+    public void followUnfollowBlockUnblock(String action, Saunoja subject, Saunoja object) {
+
+        if (action.equals("follow")) {
+
+            follow(subject, object);
+        }
+
+        if (action.equals("unfollow")) {
+
+            unFollow(subject, object);
+        }
+
+        if (action.equals("block")) {
+
+            block(subject, object);
+        }
+
+        if (action.equals("unblock")) {
+
+            unBlock(subject, object);
+        }
+    }
+
+    public LocalDateTime followingFromWhen(Saunoja follower, Saunoja followed) {
+
+        Follow follow = followRespository.findByFollowerAndFollowed(follower, followed);
+
+        return follow.getCreated();
+    }
+
+    public Saunoja getByAuthentication(Authentication auth) {
+
+        return saunojaRepository.findByUsername(auth.getName());
+    }
+
+    public Saunoja getByUsername(String username) {
+
+        return saunojaRepository.findByUsername(username);
+    }
+
+    public Authentication getCurrentAuthentication() {
+
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    public Saunoja getCurrentSaunoja() {
+
+        return saunojaRepository.findByUsername(getCurrentUsername());
+    }
+
+    public String getCurrentUsername() {
+
+        return getCurrentAuthentication().getName();
+    }
+
+    public Boolean hasErrorsOnAccountDeletion(newDeleteAccount newDeleteAccount, BindingResult bindingResult) {
+
+        String currentPassword = getCurrentSaunoja().getPassword();
+
+        if (!passwordEncoder.matches(newDeleteAccount.getPassword(), currentPassword)) {
+
+            bindingResult.rejectValue("password", "error.newDeleteAccount", "Salasana väärin.");
+        }
+
+        return bindingResult.hasErrors();
+    }
+
     public Boolean hasErrorsOnPasswordUpdate(NewPassword newPassword, BindingResult bindingResult) {
 
         String currentPassword = getCurrentSaunoja().getPassword();
@@ -538,6 +478,93 @@ public class SaunojaService {
         return bindingResult.hasErrors();
     }
 
+    public Boolean hasErrorsOnRegistration(NewSaunoja newSaunoja, BindingResult bindingResult) {
+
+        Double binarybitesToMegabitesCoefficient = 0.00000095367432;
+
+        if (!newSaunoja.getPassword().equals(newSaunoja.getConfirmPassword())) {
+
+            bindingResult.rejectValue("confirmPassword", "error.newSaunoja", "Salasanat eivät täsmää.");
+        }
+
+        if (saunojaRepository.findByUsernameIgnoreCase(newSaunoja.getUsername()) != null) {
+
+            bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus on varattu.");
+        }
+
+        if (deletedSaunojaRepository.findByUsernameIgnoreCase(newSaunoja.getUsername()) != null) {
+
+            bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnuksen käyttö on estetty.");
+        }
+
+        if (newSaunoja.getUsername().contains(" ")) {
+
+            bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnus ei saa sisältää välilyöntejä.");
+        }
+
+        if (newSaunoja.getUsername().length() < 2 || newSaunoja.getUsername().length() > 20 || newSaunoja.getUsername().isBlank()) {
+
+            bindingResult.rejectValue("username", "error.newSaunoja", "Löylytunnuksen pituden tulee olla välillä 2 - 20 merkkiä.");
+        }
+
+        if (newSaunoja.getPhoto().getSize() * binarybitesToMegabitesCoefficient >= 5) {
+
+            bindingResult.rejectValue("photo", "error.newSaunoja", "Kuva on liian suuri");
+        }
+
+        return bindingResult.hasErrors();
+    }
+
+    public Boolean haveNotBlocked(Saunoja blocker, Saunoja blocked) {
+
+        return blockRepository.findByBlockerAndBlocked(blocker, blocked) == null;
+    }
+
+    public Boolean isNotFollowing(Saunoja follower, Saunoja followed) {
+
+        return followRespository.findByFollowerAndFollowed(follower, followed) == null;
+    }
+
+    public void logout(HttpServletRequest request) {
+
+        new SecurityContextLogoutHandler().logout(request, null, null);
+    }
+
+    public List<SimpleGrantedAuthority> rolesToGrantedAuthority(Saunoja saunoja) {
+
+        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+
+        saunoja.getRoles().forEach((current) -> {
+
+            grantedAuthorities.add(new SimpleGrantedAuthority(current));
+        });
+
+        return grantedAuthorities;
+    }
+
+    public void setProfilePictureId(Saunoja saunoja, Long id) {
+
+        saunoja.setProfilePictureId(id);
+
+        saunojaRepository.save(saunoja);
+    }
+
+    public void unBlock(Saunoja blocker, Saunoja blocked) {
+
+        if (!haveNotBlocked(blocker, blocked)) {
+
+            blockRepository.deleteByBlockerAndBlocked(blocker, blocked);
+        }
+    }
+
+    public void unFollow(Saunoja follower, Saunoja followed) {
+
+        if (!isNotFollowing(follower, followed)) {
+
+            followRespository.deleteByFollowerAndFollowed(follower, followed);
+        }
+    }
+
     public void updatePassword(NewPassword newPassword) {
 
         Saunoja saunoja = getCurrentSaunoja();
@@ -546,56 +573,4 @@ public class SaunojaService {
 
         saunojaRepository.save(saunoja);
     }
-
-    public void createSomeSaunojas() throws IOException {
-
-        if (saunojaRepository.findAll().isEmpty()) {
-
-            createGod();
-
-            if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
-
-                List<String> roles = new ArrayList<>();
-
-                roles.add("USER");
-
-                saunojaRepository.save(new Saunoja("landepaukku", passwordEncoder.encode("!Sauna5"), "Antti", "Isotalo", roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-
-                saunojaRepository.save(new Saunoja("voikukka", passwordEncoder.encode("!Sauna5"), "Anniina", "Isotalo", roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-
-                roles.add("ADMIN");
-
-                saunojaRepository.save(new Saunoja("Saunatonttu", passwordEncoder.encode("!Sauna5"), "Sauna", "Tonttu", roles, LocalDateTime.now(), null, new ArrayList<Photo>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-
-                /*
-                photoService.addDefaultPhoto(getByUsername("landepaukku"));
-
-                photoService.addDefaultPhoto(getByUsername("voikukka"));
-
-                photoService.addDefaultPhoto(getByUsername("Saunatonttu"));
-                 */
-            }
-        }
-    }
-
-    public void createGod() throws IOException {
-
-        List<String> roles = new ArrayList<>();
-
-        roles.add("USER");
-
-        roles.add("ADMIN");
-
-        roles.add("GOD");
-
-        saunojaRepository.save(new Saunoja("Väinämöinen", passwordEncoder.encode("!Sauna5"), "Ariel", "Mörtengren", roles, LocalDateTime.now(), null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
-
-        //photoService.addDefaultPhoto(getByUsername("Väinämöinen"));
-    }
-
-    public void logout(HttpServletRequest request) {
-
-        new SecurityContextLogoutHandler().logout(request, null, null);
-    }
-
 }

@@ -131,7 +131,7 @@
 
             <div th:if="${messages.isEmpty()}" class="w3-container w3-card w3-white w3-round w3-margin">
                 <br/>
-                <a th:unless="${welcomeMessage.author.profilePictureId == null}" th:href="@{'/saunojat/' + ${welcomeMessage.author.username}}"><img th:src="@{'/photo/' + ${welcomeMessage.author.profilepictureId}}" alt="Löylytunnus" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
+                <a th:unless="${welcomeMessage.author.profilePictureId == null}" th:href="@{'/saunojat/' + ${welcomeMessage.author.username}}"><img th:src="@{'/photo/' + ${welcomeMessage.author.profilePictureId}}" alt="Löylytunnus" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
                 <a th:if="${welcomeMessage.author.profilePictureId == null}" th:href="@{'/saunojat/' + ${welcomeMessage.author.username}}"><img th:src="@{/defaultPicture.png}" alt="Löylytunnus" class="w3-left w3-circle w3-margin-right" style="width:50px; height:50px"/></a>
                 <span class="w3-right w3-opacity" th:unless="${welcomeMessage.created.toLocalDate().equals(#temporals.createToday())}" th:text="${#temporals.format(welcomeMessage.created, 'HH:mm d.M.yy')}">Viestin ajankohta</span>
                 <span class="w3-right w3-opacity" th:if="${welcomeMessage.created.toLocalDate().equals(#temporals.createToday())}" th:text="${' tänään ' + #temporals.format(welcomeMessage.created, 'HH:mm')}">Viestin ajankohta</span>
