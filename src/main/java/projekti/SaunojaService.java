@@ -322,7 +322,7 @@ public class SaunojaService {
 
         saunojaRepository.save(saunoja);
 
-        if (photo != null) {
+        if (photo.getBytes().length > 0) {
 
             photoService.addNewPhoto(getByUsername(username), photo.getBytes(), "", true, true);
         }
