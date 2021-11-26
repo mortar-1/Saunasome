@@ -51,14 +51,13 @@ public class PhotoService {
             Photo photo = createNewPhoto(author, content);
 
             photo.setDescription(description);
-            
 
             if (isProfilepicture && !photoRepository.findByAuthor(author).isEmpty()) {
-               
+
                 for (Photo current : photoRepository.findByAuthor(author)) {
 
                     current.setIsProfilePicture(false);
-                    
+
                     photoRepository.save(current);
                 }
             }
@@ -181,7 +180,7 @@ public class PhotoService {
 
                 photoRepository.findByAuthor(author).get(0).setIsProfilePicture(true);
 
-                saunojaService.setProfilePictureId(author, photoRepository.findByAuthor(author).get(1).getId());
+                saunojaService.setProfilePictureId(author, photoRepository.findByAuthor(author).get(0).getId());
             }
         }
 
