@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-
 public class NewSaunoja {
 
     @NotEmpty

@@ -51,12 +51,15 @@ public class PhotoService {
             Photo photo = createNewPhoto(author, content);
 
             photo.setDescription(description);
+            
 
             if (isProfilepicture && !photoRepository.findByAuthor(author).isEmpty()) {
-
+               
                 for (Photo current : photoRepository.findByAuthor(author)) {
 
                     current.setIsProfilePicture(false);
+                    
+                    photoRepository.save(current);
                 }
             }
 
