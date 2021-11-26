@@ -8,9 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/*
 @Controller
 @Profile("production")
 public class CustomErrorController implements ErrorController {
+    
     
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request) {
@@ -42,4 +44,6 @@ public class CustomErrorController implements ErrorController {
         return "/error";
     }
 
+
 }
+*/
